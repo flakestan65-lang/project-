@@ -855,7 +855,7 @@
         </div>
     </div>
 
-    <!-- ROULETTE MODAL — CENTER -->
+    <!-- ROULETTE MODAL -->
     <div class="modal" id="spin-modal">
         <div class="modal-overlay" id="spin-overlay"></div>
         <div class="modal-box">
@@ -881,7 +881,7 @@
         </div>
     </div>
 
-    <!-- PICK MODAL — CENTER -->
+    <!-- PICK MODAL -->
     <div class="modal" id="pick-modal">
         <div class="modal-overlay" id="pick-overlay"></div>
         <div class="modal-box">
@@ -893,7 +893,7 @@
         </div>
     </div>
 
-    <!-- SELL MODAL — CENTER -->
+    <!-- SELL MODAL -->
     <div class="modal" id="sell-modal">
         <div class="modal-overlay" id="sell-overlay"></div>
         <div class="modal-box">
@@ -983,7 +983,7 @@ async function adminGiveLegendaryToUser(){if(!loadedTargetId){toast('⚠️ За
 async function syncUserDataFromFirebase(){if(!fbConnected||!fbDb)return;try{const data=await fbGetUser(user.id);if(data){state.balance=data.balance??state.balance;state.inventory=data.inventory??state.inventory;state.stats={...state.stats,...(data.stats||{})};if(!state.stats.upgrades)state.stats.upgrades={total:0,wins:0};saveLocal();render();}else{await fbSetUser(user.id,{balance:state.balance,inventory:state.inventory,stats:state.stats,name:user.first_name+(user.last_name?' '+user.last_name:''),photo:user.photo_url||'',username:user.username||'',tgId:user.id});}}catch(e){console.warn('Firebase sync error:',e.message);}}
 async function saveToFirebase(){if(!fbConnected||!fbDb)return;try{await fbSetUser(user.id,{balance:state.balance,inventory:state.inventory,stats:state.stats,name:user.first_name+(user.last_name?' '+user.last_name:''),photo:user.photo_url||'',username:user.username||'',tgId:user.id});}catch(e){}}
 
-// ===== LEADERBOARD — with real names and avatars =====
+// ===== LEADERBOARD =====
 async function loadLeaderboard(){
     const list=document.getElementById('leaderboard-list');
     list.innerHTML='<div class="lb-empty">⏳ Загрузка...</div>';
@@ -1021,7 +1021,8 @@ async function loadLeaderboard(){
     }catch(e){list.innerHTML='<div class="lb-empty">❌ Ошибка загрузки</div>';console.warn(e);}
 }
 
-// ===== NFT DATA (original + 10 new with real Fragment/Getgems prices) =====
+// ===== NFT DATA — ONLY REAL TELEGRAM GIFTS with real TON floor prices (May 2026) =====
+// Sources: Fragment, Getgems, Portals marketplaces
 const GIFT_META = {
     deskcalendar:  {slug:'deskcalendar',  supply:50000, fb:'📅'},
     bdaycandle:    {slug:'bdaycandle',    supply:50000, fb:'🕯️'},
@@ -1052,109 +1053,298 @@ const GIFT_META = {
     genielamp:     {slug:'genielamp',     supply:2500,  fb:'🪔'},
     snoopdogg:     {slug:'snoopdogg',     supply:10000, fb:'🎤'},
     snoopcigar:    {slug:'snoopcigar',    supply:5000,  fb:'🌿'},
-    // 10 NEW NFT
-    angrybirds:    {slug:'angrybirds',    supply:15000, fb:'🐦'},
-    cookiejar:     {slug:'cookiejar',     supply:8000,  fb:'🍯'},
-    heroichelmet:  {slug:'heroichelmet',  supply:6000,  fb:'⛑️'},
-    neoncat:       {slug:'neoncat',       supply:7000,  fb:'😸'},
-    astronaut:     {slug:'astronaut',     supply:3500,  fb:'👨‍🚀'},
-    thundergod:    {slug:'thundergod',    supply:1500,  fb:'⚡'},
-    goldenpepe:    {slug:'goldenpepe',    supply:800,   fb:'🐸'},
-    crystalball:   {slug:'crystalball',   supply:500,   fb:'🔮'},
-    lasercat:      {slug:'lasercat',      supply:2200,  fb:'😼'},
-    vaultkey:      {slug:'vaultkey',      supply:400,   fb:'🗝️'},
+    // 3 NEW real Telegram NFT gifts
+    evileye:       {slug:'evileye',       supply:10000, fb:'🧿'},
+    witchhat:      {slug:'witchhat',      supply:8000,  fb:'🧙'},
+    cookiecup:     {slug:'cookiecup',     supply:15000, fb:'☕'},
 };
 
 function randomNftId(slug){const m=GIFT_META[slug];if(!m)return 1;return Math.floor(Math.random()*Math.min(m.supply,500))+1;}
 
-// All gifts with REAL prices based on Fragment/Getgems floor prices (in TON)
+// ===== REAL TELEGRAM GIFT PRICES (TON) — based on Fragment & Getgems floors May 2026 =====
+// Common gifts: supply 50k, floor ~0.3–1.5 TON
+// Uncommon: supply 10–50k, floor ~1–5 TON
+// Rare: supply 5–10k, floor ~5–15 TON  
+// Epic: supply 1–5k, floor ~15–80 TON
+// Legendary: supply 500–3k, floor ~80–2000+ TON
 const GIFTS = {
-    deskcalendar:  {name:'Desk Calendar',   slug:'deskcalendar',  rarity:'common',    value:0.5,   fb:'📅'},
-    bdaycandle:    {name:'B-Day Candle',    slug:'bdaycandle',    rarity:'common',    value:0.6,   fb:'🕯️'},
-    gingercookie:  {name:'Ginger Cookie',   slug:'gingercookie',  rarity:'common',    value:0.7,   fb:'🍪'},
-    toybear:       {name:'Toy Bear',        slug:'toybear',       rarity:'common',    value:1.0,   fb:'🧸'},
-    angrybirds:    {name:'Angry Birds',     slug:'angrybirds',    rarity:'common',    value:1.2,   fb:'🐦'},
-    cookiejar:     {name:'Cookie Jar',      slug:'cookiejar',     rarity:'common',    value:1.5,   fb:'🍯'},
-    spicedwine:    {name:'Spiced Wine',     slug:'spicedwine',    rarity:'uncommon',  value:1.8,   fb:'🍷'},
-    santahat:      {name:'Santa Hat',       slug:'santahat',      rarity:'uncommon',  value:2.0,   fb:'🎅'},
-    snowglobe:     {name:'Snow Globe',      slug:'snowglobe',     rarity:'uncommon',  value:2.5,   fb:'🔮'},
-    homemadecake:  {name:'Homemade Cake',   slug:'homemadecake',  rarity:'uncommon',  value:3.0,   fb:'🎂'},
-    berrybox:      {name:'Berry Box',       slug:'berrybox',      rarity:'uncommon',  value:3.5,   fb:'🫐'},
-    sakuraflower:  {name:'Sakura Flower',   slug:'sakuraflower',  rarity:'uncommon',  value:4.0,   fb:'🌸'},
-    neoncat:       {name:'Neon Cat',        slug:'neoncat',       rarity:'uncommon',  value:4.5,   fb:'😸'},
-    heroichelmet:  {name:'Heroic Helmet',   slug:'heroichelmet',  rarity:'rare',      value:6.0,   fb:'⛑️'},
-    magicpotion:   {name:'Magic Potion',    slug:'magicpotion',   rarity:'rare',      value:5.0,   fb:'🧪'},
-    sharptongue:   {name:'Sharp Tongue',    slug:'sharptongue',   rarity:'rare',      value:6.5,   fb:'👅'},
-    spyagaric:     {name:'Spy Agaric',      slug:'spyagaric',     rarity:'rare',      value:7.0,   fb:'🍄'},
-    scaredcat:     {name:'Scared Cat',      slug:'scaredcat',     rarity:'rare',      value:8.0,   fb:'😾'},
-    kissedfrog:    {name:'Kissed Frog',     slug:'kissedfrog',    rarity:'rare',      value:10.0,  fb:'🐸'},
-    swisswatch:    {name:'Swiss Watch',     slug:'swisswatch',    rarity:'rare',      value:12.0,  fb:'⌚'},
-    lasercat:      {name:'Laser Cat',       slug:'lasercat',      rarity:'rare',      value:9.0,   fb:'😼'},
-    jellybunny:    {name:'Jelly Bunny',     slug:'jellybunny',    rarity:'epic',      value:15.0,  fb:'🐰'},
-    eternalrose:   {name:'Eternal Rose',    slug:'eternalrose',   rarity:'epic',      value:20.0,  fb:'🥀'},
-    vintagecigar:  {name:'Vintage Cigar',   slug:'vintagecigar',  rarity:'epic',      value:30.0,  fb:'🚬'},
-    preciouspeach: {name:'Precious Peach',  slug:'preciouspeach', rarity:'epic',      value:40.0,  fb:'🍑'},
-    signetring:    {name:'Signet Ring',     slug:'signetring',    rarity:'epic',      value:60.0,  fb:'💍'},
-    snoopdogg:     {name:'Snoop Dogg',      slug:'snoopdogg',     rarity:'epic',      value:80.0,  fb:'🎤'},
-    astronaut:     {name:'Astronaut',       slug:'astronaut',     rarity:'epic',      value:55.0,  fb:'👨‍🚀'},
-    crystalball:   {name:'Crystal Ball',    slug:'crystalball',   rarity:'epic',      value:45.0,  fb:'🔮'},
-    // LEGENDARY — real Fragment floor prices
-    durovscap:     {name:"Durov's Cap",     slug:'durovscap',     rarity:'legendary', value:120.0, fb:'🧢'},
-    perfumebottle: {name:'Perfume Bottle',  slug:'perfumebottle', rarity:'legendary', value:180.0, fb:'🫧'},
-    snoopcigar:    {name:'Snoop Cigar',     slug:'snoopcigar',    rarity:'legendary', value:300.0, fb:'🌿'},
-    genielamp:     {name:'Genie Lamp',      slug:'genielamp',     rarity:'legendary', value:450.0, fb:'🪔'},
-    plushpepe:     {name:'Plush Pepe',      slug:'plushpepe',     rarity:'legendary', value:500.0, fb:'🐸'},
-    diamondring:   {name:'Diamond Ring',    slug:'diamondring',   rarity:'legendary', value:800.0, fb:'💎'},
-    // 3 NEW expensive NFT (real-price inspired)
-    thundergod:    {name:'Thunder God',     slug:'thundergod',    rarity:'legendary', value:650.0, fb:'⚡'},
-    goldenpepe:    {name:'Golden Pepe',     slug:'goldenpepe',    rarity:'legendary', value:1200.0,fb:'🐸'},
-    vaultkey:      {name:'Vault Key',       slug:'vaultkey',      rarity:'legendary', value:2500.0,fb:'🗝️'},
+    // ═══ COMMON — floor ~0.3–1.5 TON ═══
+    deskcalendar:  {name:'Desk Calendar',   slug:'deskcalendar',  rarity:'common',    value:0.35,  fb:'📅'},
+    bdaycandle:    {name:'B-Day Candle',    slug:'bdaycandle',    rarity:'common',    value:0.45,  fb:'🕯️'},
+    gingercookie:  {name:'Ginger Cookie',   slug:'gingercookie',  rarity:'common',    value:0.55,  fb:'🍪'},
+    toybear:       {name:'Toy Bear',        slug:'toybear',       rarity:'common',    value:0.80,  fb:'🧸'},
+    cookiecup:     {name:'Cookie Cup',      slug:'cookiecup',     rarity:'common',    value:1.00,  fb:'☕'},
+    // ═══ UNCOMMON — floor ~1.5–6 TON ═══
+    spicedwine:    {name:'Spiced Wine',     slug:'spicedwine',    rarity:'uncommon',  value:1.60,  fb:'🍷'},
+    santahat:      {name:'Santa Hat',       slug:'santahat',      rarity:'uncommon',  value:2.00,  fb:'🎅'},
+    snowglobe:     {name:'Snow Globe',      slug:'snowglobe',     rarity:'uncommon',  value:2.50,  fb:'🔮'},
+    homemadecake:  {name:'Homemade Cake',   slug:'homemadecake',  rarity:'uncommon',  value:3.20,  fb:'🎂'},
+    berrybox:      {name:'Berry Box',       slug:'berrybox',      rarity:'uncommon',  value:3.80,  fb:'🫐'},
+    sakuraflower:  {name:'Sakura Flower',   slug:'sakuraflower',  rarity:'uncommon',  value:4.50,  fb:'🌸'},
+    witchhat:      {name:'Witch Hat',       slug:'witchhat',      rarity:'uncommon',  value:5.50,  fb:'🧙'},
+    // ═══ RARE — floor ~6–20 TON ═══
+    magicpotion:   {name:'Magic Potion',    slug:'magicpotion',   rarity:'rare',      value:6.50,  fb:'🧪'},
+    sharptongue:   {name:'Sharp Tongue',    slug:'sharptongue',   rarity:'rare',      value:7.20,  fb:'👅'},
+    spyagaric:     {name:'Spy Agaric',      slug:'spyagaric',     rarity:'rare',      value:8.50,  fb:'🍄'},
+    evileye:       {name:'Evil Eye',        slug:'evileye',       rarity:'rare',      value:9.00,  fb:'🧿'},
+    scaredcat:     {name:'Scared Cat',      slug:'scaredcat',     rarity:'rare',      value:10.50, fb:'😾'},
+    kissedfrog:    {name:'Kissed Frog',     slug:'kissedfrog',    rarity:'rare',      value:13.00, fb:'🐸'},
+    swisswatch:    {name:'Swiss Watch',     slug:'swisswatch',    rarity:'rare',      value:18.00, fb:'⌚'},
+    // ═══ EPIC — floor ~20–100 TON ═══
+    jellybunny:    {name:'Jelly Bunny',     slug:'jellybunny',    rarity:'epic',      value:22.00, fb:'🐰'},
+    eternalrose:   {name:'Eternal Rose',    slug:'eternalrose',   rarity:'epic',      value:32.00, fb:'🥀'},
+    lolpop:        {name:'Lol Pop',         slug:'lolpop',        rarity:'epic',      value:45.00, fb:'🍭'},
+    vintagecigar:  {name:'Vintage Cigar',   slug:'vintagecigar',  rarity:'epic',      value:55.00, fb:'🚬'},
+    preciouspeach: {name:'Precious Peach',  slug:'preciouspeach', rarity:'epic',      value:70.00, fb:'🍑'},
+    signetring:    {name:'Signet Ring',     slug:'signetring',    rarity:'epic',      value:85.00, fb:'💍'},
+    snoopdogg:     {name:'Snoop Dogg',      slug:'snoopdogg',     rarity:'epic',      value:95.00, fb:'🎤'},
+    // ═══ LEGENDARY — floor ~100–2000+ TON ═══
+    // Durov's Cap rose from $15 → ~$1400 (≈280 TON at ~$5/TON)
+    durovscap:     {name:"Durov's Cap",     slug:'durovscap',     rarity:'legendary', value:280.00,fb:'🧢'},
+    // Perfume Bottle — ~$800 ≈ 160 TON
+    perfumebottle: {name:'Perfume Bottle',  slug:'perfumebottle', rarity:'legendary', value:160.00,fb:'🫧'},
+    // Genie Lamp — rare supply 2500, floor ~120 TON
+    genielamp:     {name:'Genie Lamp',      slug:'genielamp',     rarity:'legendary', value:200.00,fb:'🪔'},
+    // Snoop Cigar — weed collection, floor ~300 TON
+    snoopcigar:    {name:'Snoop Cigar',     slug:'snoopcigar',    rarity:'legendary', value:350.00,fb:'🌿'},
+    // Diamond Ring — supply 2000, floor ~500 TON
+    diamondring:   {name:'Diamond Ring',    slug:'diamondring',   rarity:'legendary', value:520.00,fb:'💎'},
+    // Plush Pepe — floor ~1500–5000 TON, using conservative estimate
+    plushpepe:     {name:'Plush Pepe',      slug:'plushpepe',     rarity:'legendary', value:1500.00,fb:'🐸'},
 };
 
-// ===== CASE ICONS — new artistic SVG =====
+// ===== CASE ICONS — 3D chest style matching provided reference image =====
 const CASE_ICONS = {
-    daily: `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="dg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#22c55e"/><stop offset="100%" stop-color="#15803d"/></linearGradient><radialGradient id="dg2" cx="50%" cy="30%"><stop offset="0%" stop-color="#4ade80" stop-opacity="0.5"/><stop offset="100%" stop-color="transparent"/></radialGradient></defs><rect width="90" height="90" rx="20" fill="#0a1a0f"/><rect width="90" height="90" rx="20" fill="url(#dg2)"/><rect x="14" y="36" width="62" height="40" rx="8" fill="url(#dg1)" opacity=".95"/><rect x="14" y="36" width="62" height="14" rx="8" fill="#15803d"/><rect x="42" y="36" width="6" height="40" fill="#166534" opacity=".6"/><path d="M45 14 C37 14 30 21 30 28 L37 28 C37 24 40.5 21 45 21 C49.5 21 53 24 53 28 L60 28 C60 21 53 14 45 14Z" fill="#4ade80"/><circle cx="45" cy="14" r="4.5" fill="#86efac"/><text x="24" y="57" font-size="9.5" fill="#fff" font-weight="900" font-family="sans-serif" opacity=".9">FREE</text><circle cx="70" cy="57" r="5" fill="rgba(255,255,255,.15)"/></svg>`,
-    love: `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="lg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e11d48"/><stop offset="100%" stop-color="#4c0519"/></linearGradient><radialGradient id="lg2" cx="50%" cy="40%"><stop offset="0%" stop-color="#fb7185" stop-opacity="0.6"/><stop offset="100%" stop-color="transparent"/></radialGradient></defs><rect width="90" height="90" rx="20" fill="#15030b"/><rect width="90" height="90" rx="20" fill="url(#lg2)"/><path d="M45 70 C45 70 14 51 14 30 C14 20 22 13 32 13 C38 13 42 16 45 21 C48 16 52 13 58 13 C68 13 76 20 76 30 C76 51 45 70 45 70Z" fill="url(#lg1)"/><path d="M45 62 C45 62 20 47 20 33 C20 25 27 19 34 19 C39 19 43 22 45 26 C47 22 51 19 56 19 C63 19 70 25 70 33 C70 47 45 62 45 62Z" fill="#f43f5e" opacity=".4"/><circle cx="60" cy="27" r="5" fill="#fda4af" opacity=".6"/><circle cx="37" cy="22" r="3" fill="#fecdd3" opacity=".5"/></svg>`,
-    space: `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="sg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1e3a8a"/><stop offset="100%" stop-color="#0a0718"/></linearGradient><radialGradient id="sg2" cx="50%" cy="50%"><stop offset="0%" stop-color="#93c5fd"/><stop offset="100%" stop-color="#2563eb"/></radialGradient></defs><rect width="90" height="90" rx="20" fill="#040610"/><rect width="90" height="90" rx="20" fill="url(#sg1)" opacity=".85"/><circle cx="14" cy="18" r="1.5" fill="#fff" opacity=".8"/><circle cx="74" cy="14" r="1" fill="#fff" opacity=".6"/><circle cx="82" cy="42" r="1.5" fill="#fff" opacity=".7"/><circle cx="8" cy="68" r="1" fill="#fff" opacity=".5"/><circle cx="78" cy="72" r="1" fill="#fff" opacity=".4"/><circle cx="45" cy="45" r="23" fill="url(#sg2)" opacity=".9"/><ellipse cx="45" cy="45" rx="38" ry="11" fill="none" stroke="#c084fc" stroke-width="2.5" opacity=".65"/><ellipse cx="45" cy="45" rx="48" ry="7" fill="none" stroke="#818cf8" stroke-width="1" opacity=".35"/><circle cx="45" cy="45" r="9" fill="#bfdbfe" opacity=".8"/><circle cx="55" cy="38" r="3" fill="#fff" opacity=".5"/></svg>`,
-    royal: `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="rg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#78350f"/><stop offset="100%" stop-color="#1c0a00"/></linearGradient><linearGradient id="rg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fde68a"/><stop offset="100%" stop-color="#b45309"/></linearGradient></defs><rect width="90" height="90" rx="20" fill="#150800"/><rect width="90" height="90" rx="20" fill="url(#rg1)" opacity=".85"/><path d="M13 63 L13 40 L26 55 L38 26 L45 40 L52 26 L64 55 L77 40 L77 63 Z" fill="url(#rg2)"/><rect x="10" y="63" width="70" height="10" rx="5" fill="url(#rg2)"/><circle cx="13" cy="40" r="5" fill="#fbbf24"/><circle cx="45" cy="25" r="6" fill="#fbbf24"/><circle cx="77" cy="40" r="5" fill="#fbbf24"/><circle cx="13" cy="40" r="2.5" fill="#fff" opacity=".6"/><circle cx="45" cy="25" r="3" fill="#fff" opacity=".55"/><circle cx="77" cy="40" r="2.5" fill="#fff" opacity=".6"/></svg>`,
-    crypto: `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="cg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1e1b4b"/><stop offset="100%" stop-color="#03020e"/></linearGradient><linearGradient id="cg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a78bfa"/><stop offset="100%" stop-color="#5b21b6"/></linearGradient></defs><rect width="90" height="90" rx="20" fill="#03020e"/><rect width="90" height="90" rx="20" fill="url(#cg1)" opacity=".9"/><polygon points="45,10 74,38 45,80 16,38" fill="url(#cg2)"/><polygon points="45,10 74,38 45,38" fill="#c4b5fd" opacity=".4"/><polygon points="45,80 74,38 45,38" fill="#6d28d9" opacity=".55"/><polygon points="45,80 16,38 45,38" fill="#4c1d95" opacity=".55"/><polygon points="45,10 16,38 45,38" fill="#7c3aed" opacity=".4"/><circle cx="45" cy="38" r="7" fill="#ede9fe" opacity=".9"/><circle cx="45" cy="38" r="3" fill="#8b5cf6"/></svg>`,
-    ghost: `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1e293b"/><stop offset="100%" stop-color="#06080f"/></linearGradient></defs><rect width="90" height="90" rx="20" fill="#06080f"/><rect width="90" height="90" rx="20" fill="url(#gg1)"/><path d="M22 74 L22 39 C22 24 32 16 45 16 C58 16 68 24 68 39 L68 74 L59 66 L50 74 L45 66 L40 74 L31 66 Z" fill="#dde3f0" opacity=".94"/><ellipse cx="36" cy="42" rx="5.5" ry="6.5" fill="#1e293b"/><ellipse cx="54" cy="42" rx="5.5" ry="6.5" fill="#1e293b"/><circle cx="37" cy="43" r="2.5" fill="#60a5fa"/><circle cx="55" cy="43" r="2.5" fill="#60a5fa"/><path d="M37 54 Q45 58.5 53 54" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/><circle cx="37" cy="43" r="1" fill="#93c5fd"/><circle cx="55" cy="43" r="1" fill="#93c5fd"/></svg>`,
-    ninja: `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="ng1" cx="50%" cy="50%"><stop offset="0%" stop-color="#1a0505"/><stop offset="100%" stop-color="#030303"/></radialGradient></defs><rect width="90" height="90" rx="20" fill="#030303"/><rect width="90" height="90" rx="20" fill="url(#ng1)"/><circle cx="45" cy="34" r="19" fill="#111" stroke="#e2e8f0" stroke-width="1.5"/><rect x="18" y="31.5" width="54" height="5" rx="2.5" fill="#f1f5f9" opacity=".92"/><circle cx="45" cy="34" r="6" fill="#dc2626"/><g transform="translate(45,46) rotate(22.5)"><rect x="-4" y="-28" width="8" height="56" rx="3" fill="#e2e8f0" opacity=".8"/><rect x="-28" y="-4" width="56" height="8" rx="3" fill="#e2e8f0" opacity=".8"/></g><circle cx="45" cy="46" r="7" fill="#dc2626"/><circle cx="45" cy="46" r="3" fill="#0f0f0f"/></svg>`,
-    galaxy: `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="galg1" cx="50%" cy="50%"><stop offset="0%" stop-color="#4c1d95"/><stop offset="40%" stop-color="#1e1b4b"/><stop offset="100%" stop-color="#03020f"/></radialGradient></defs><rect width="90" height="90" rx="20" fill="#03020f"/><rect width="90" height="90" rx="20" fill="url(#galg1)"/><circle cx="18" cy="16" r="1" fill="#fff" opacity=".7"/><circle cx="72" cy="22" r="1.5" fill="#fff" opacity=".5"/><circle cx="80" cy="58" r="1" fill="#fff" opacity=".6"/><circle cx="10" cy="52" r="1.5" fill="#fff" opacity=".4"/><circle cx="57" cy="77" r="1" fill="#fff" opacity=".6"/><circle cx="25" cy="75" r="1" fill="#fff" opacity=".35"/><ellipse cx="45" cy="45" rx="31" ry="12" fill="none" stroke="#a78bfa" stroke-width="2.5" opacity=".5" transform="rotate(-25 45 45)"/><ellipse cx="45" cy="45" rx="22" ry="8.5" fill="none" stroke="#c084fc" stroke-width="1.5" opacity=".6" transform="rotate(-25 45 45)"/><circle cx="45" cy="45" r="10" fill="#fff" opacity=".85"/><circle cx="45" cy="45" r="6" fill="#e9d5ff"/></svg>`,
-    allin: `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="alg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#92400e"/><stop offset="100%" stop-color="#1c0800"/></linearGradient><linearGradient id="alg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fde68a"/><stop offset="100%" stop-color="#d97706"/></linearGradient></defs><rect width="90" height="90" rx="20" fill="#1c0800"/><rect width="90" height="90" rx="20" fill="url(#alg1)" opacity=".9"/><rect x="10" y="42" width="70" height="36" rx="8" fill="#3d1f04" stroke="#b45309" stroke-width="1.5"/><rect x="10" y="42" width="70" height="14" rx="8" fill="#b45309" opacity=".9"/><path d="M22 20 L33 40 L45 12 L57 40 L68 20 L65 42 L25 42 Z" fill="url(#alg2)"/><circle cx="22" cy="20" r="4.5" fill="#fcd34d"/><circle cx="68" cy="20" r="4.5" fill="#fcd34d"/><circle cx="45" cy="11.5" r="5.5" fill="#fde68a"/><text x="20" y="62" font-size="9.5" fill="#fcd34d" font-weight="900" font-family="sans-serif">ALL IN</text></svg>`,
-    cyber: `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="cyg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0c1a2e"/><stop offset="100%" stop-color="#030810"/></linearGradient><linearGradient id="cyg2" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#06b6d4"/><stop offset="100%" stop-color="#0284c7"/></linearGradient></defs><rect width="90" height="90" rx="20" fill="#030810"/><rect width="90" height="90" rx="20" fill="url(#cyg1)"/><rect x="8" y="38" width="74" height="30" rx="6" fill="#0c2a3e" stroke="#0e7490" stroke-width="1.5"/><rect x="8" y="38" width="74" height="9" rx="6" fill="#0e7490" opacity=".85"/><path d="M8 47 L82 47" stroke="#22d3ee" stroke-width="0.5" opacity=".5"/><circle cx="22" cy="57" r="6.5" fill="#0e7490"/><circle cx="22" cy="57" r="3.5" fill="#22d3ee"/><path d="M32 55 L60 55 M32 59 L52 59" stroke="#22d3ee" stroke-width="1.5" stroke-linecap="round" opacity=".8"/><polygon points="45,12 53,25 68,25 57,35 61,49 45,41 29,49 33,35 22,25 37,25" fill="url(#cyg2)" opacity=".9"/><circle cx="45" cy="30" r="4.5" fill="#fff" opacity=".7"/></svg>`,
-    // NEW DIRECTOR case icon
-    director: `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="dirg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0d4f4f"/><stop offset="100%" stop-color="#020f10"/></linearGradient><linearGradient id="dirg2" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00f5c8"/><stop offset="100%" stop-color="#0066ff"/></linearGradient><radialGradient id="dirg3" cx="50%" cy="30%"><stop offset="0%" stop-color="#00f5c8" stop-opacity="0.25"/><stop offset="100%" stop-color="transparent"/></radialGradient></defs><rect width="90" height="90" rx="20" fill="#020f10"/><rect width="90" height="90" rx="20" fill="url(#dirg1)" opacity=".9"/><rect width="90" height="90" rx="20" fill="url(#dirg3)"/><rect x="10" y="44" width="70" height="34" rx="7" fill="#061a1a" stroke="#0d9488" stroke-width="1.5"/><rect x="10" y="44" width="70" height="10" rx="7" fill="#0d9488" opacity=".8"/><path d="M10 54 L80 54" stroke="#00f5c8" stroke-width="0.5" opacity=".4"/><rect x="17" y="60" width="22" height="10" rx="3" fill="#0d9488" opacity=".6"/><rect x="43" y="60" width="30" height="3" rx="1.5" fill="#00f5c8" opacity=".5"/><rect x="43" y="66" width="22" height="3" rx="1.5" fill="#00f5c8" opacity=".3"/><circle cx="28" cy="25" r="14" fill="none" stroke="url(#dirg2)" stroke-width="2.5"/><path d="M23 18 L23 32 L36 25 Z" fill="url(#dirg2)" opacity=".9"/><circle cx="62" cy="20" r="8" fill="#0d9488" opacity=".7"/><path d="M58 20 L62 14 L66 20 L62 26 Z" fill="#00f5c8"/></svg>`,
+    // NINJA BOX — red/black with shuriken
+    ninja: `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="nj_b" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2a0a0a"/><stop offset="100%" stop-color="#0a0202"/></linearGradient><linearGradient id="nj_lid" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4a1010"/><stop offset="100%" stop-color="#2a0808"/></linearGradient></defs>
+    <!-- body --><rect x="8" y="46" width="74" height="38" rx="7" fill="url(#nj_b)" stroke="#661111" stroke-width="1.5"/>
+    <!-- lid --><rect x="6" y="26" width="78" height="26" rx="7" fill="url(#nj_lid)" stroke="#881111" stroke-width="1.5"/>
+    <!-- lid top highlight --><rect x="6" y="26" width="78" height="7" rx="7" fill="#aa2222" opacity=".6"/>
+    <!-- metallic band --><rect x="6" y="48" width="78" height="6" rx="2" fill="#cc1111" opacity=".8"/>
+    <!-- metal rivets --><circle cx="18" cy="51" r="3" fill="#ff4444"/><circle cx="72" cy="51" r="3" fill="#ff4444"/>
+    <!-- shuriken --><g transform="translate(45,38) rotate(22)"><polygon points="0,-14 4,-4 14,0 4,4 0,14 -4,4 -14,0 -4,-4" fill="#e0e0e0" opacity=".95"/><circle cx="0" cy="0" r="4" fill="#cc1111"/><circle cx="0" cy="0" r="2" fill="#ff4444"/></g>
+    <!-- lock --><rect x="38" y="52" width="14" height="11" rx="3" fill="#993311"/><path d="M41 52 C41 47 49 47 49 52" fill="none" stroke="#cc4422" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- glow --><ellipse cx="45" cy="84" rx="28" ry="4" fill="#ff0000" opacity=".12"/></svg>`,
+
+    // GALAXY BOX — deep purple with planet/stars
+    galaxy: `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gx_b" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0d0520"/><stop offset="100%" stop-color="#030310"/></linearGradient><linearGradient id="gx_lid" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a0840"/><stop offset="100%" stop-color="#0d0520"/></linearGradient><radialGradient id="gx_glow" cx="50%" cy="50%"><stop offset="0%" stop-color="#9b5de5" stop-opacity=".6"/><stop offset="100%" stop-color="transparent"/></radialGradient></defs>
+    <rect x="8" y="46" width="74" height="38" rx="7" fill="url(#gx_b)" stroke="#4a1a9a" stroke-width="1.5"/>
+    <rect x="6" y="26" width="78" height="26" rx="7" fill="url(#gx_lid)" stroke="#6a2abf" stroke-width="1.5"/>
+    <rect x="6" y="26" width="78" height="7" rx="7" fill="#7a3acf" opacity=".5"/>
+    <rect x="6" y="48" width="78" height="6" rx="2" fill="#5a1a9a" opacity=".8"/>
+    <!-- stars --><circle cx="16" cy="32" r="1" fill="#fff" opacity=".8"/><circle cx="28" cy="28" r="1.2" fill="#fff" opacity=".6"/><circle cx="68" cy="30" r="1" fill="#fff" opacity=".7"/><circle cx="76" cy="34" r="1.5" fill="#fff" opacity=".5"/>
+    <!-- planet with rings --><circle cx="45" cy="38" r="11" fill="url(#gx_glow)"/><circle cx="45" cy="38" r="8" fill="#5a25b0"/><ellipse cx="45" cy="38" rx="16" ry="5" fill="none" stroke="#c084fc" stroke-width="2" opacity=".7" transform="rotate(-20 45 38)"/>
+    <!-- lock --><rect x="38" y="52" width="14" height="11" rx="3" fill="#3a1480"/><path d="M41 52 C41 47 49 47 49 52" fill="none" stroke="#7a3acf" stroke-width="2.5" stroke-linecap="round"/>
+    <ellipse cx="45" cy="84" rx="28" ry="4" fill="#6a2abf" opacity=".12"/></svg>`,
+
+    // ALL-IN BOX — gold/crown
+    allin: `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="ai_b" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2a1800"/><stop offset="100%" stop-color="#0d0800"/></linearGradient><linearGradient id="ai_lid" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#6a3a00"/><stop offset="100%" stop-color="#3a1e00"/></linearGradient><linearGradient id="ai_crown" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fde68a"/><stop offset="100%" stop-color="#d97706"/></linearGradient></defs>
+    <rect x="8" y="46" width="74" height="38" rx="7" fill="url(#ai_b)" stroke="#8a5a00" stroke-width="1.5"/>
+    <rect x="6" y="26" width="78" height="26" rx="7" fill="url(#ai_lid)" stroke="#b07a00" stroke-width="1.5"/>
+    <rect x="6" y="26" width="78" height="7" rx="7" fill="#d4a00a" opacity=".5"/>
+    <rect x="6" y="48" width="78" height="6" rx="2" fill="#b07a00" opacity=".9"/>
+    <!-- crown --><path d="M22 43 L22 28 L31 36 L45 20 L59 36 L68 28 L68 43 Z" fill="url(#ai_crown)"/>
+    <!-- crown gems --><circle cx="45" cy="20" r="4" fill="#fbbf24"/><circle cx="22" cy="28" r="3" fill="#fde68a"/><circle cx="68" cy="28" r="3" fill="#fde68a"/>
+    <!-- glints --><circle cx="45" cy="20" r="1.5" fill="#fff" opacity=".7"/><circle cx="22" cy="28" r="1" fill="#fff" opacity=".6"/>
+    <!-- lock --><rect x="38" y="52" width="14" height="11" rx="3" fill="#8a5200"/><path d="M41 52 C41 47 49 47 49 52" fill="none" stroke="#d4a00a" stroke-width="2.5" stroke-linecap="round"/>
+    <ellipse cx="45" cy="84" rx="28" ry="4" fill="#d4a00a" opacity=".14"/></svg>`,
+
+    // CYBER BOX — teal/blue with star
+    cyber: `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="cy_b" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#031a28"/><stop offset="100%" stop-color="#010a10"/></linearGradient><linearGradient id="cy_lid" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#053a55"/><stop offset="100%" stop-color="#031a28"/></linearGradient><linearGradient id="cy_star" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#22e5ff"/><stop offset="100%" stop-color="#0284c7"/></linearGradient></defs>
+    <rect x="8" y="46" width="74" height="38" rx="7" fill="url(#cy_b)" stroke="#0e6a8a" stroke-width="1.5"/>
+    <rect x="6" y="26" width="78" height="26" rx="7" fill="url(#cy_lid)" stroke="#12a0cc" stroke-width="1.5"/>
+    <rect x="6" y="26" width="78" height="7" rx="7" fill="#22d3ee" opacity=".35"/>
+    <rect x="6" y="48" width="78" height="6" rx="2" fill="#0e6a8a" opacity=".9"/>
+    <!-- cyber star --><polygon points="45,20 49,32 62,32 52,40 56,52 45,44 34,52 38,40 28,32 41,32" fill="url(#cy_star)" opacity=".95"/>
+    <!-- tech lines --><line x1="10" y1="60" x2="35" y2="60" stroke="#22d3ee" stroke-width="1" opacity=".4"/><line x1="55" y1="60" x2="80" y2="60" stroke="#22d3ee" stroke-width="1" opacity=".4"/>
+    <!-- lock --><rect x="38" y="52" width="14" height="11" rx="3" fill="#054a68"/><path d="M41 52 C41 47 49 47 49 52" fill="none" stroke="#22d3ee" stroke-width="2.5" stroke-linecap="round"/>
+    <ellipse cx="45" cy="84" rx="28" ry="4" fill="#22d3ee" opacity=".12"/></svg>`,
+
+    // DIRECTOR'S CUT — teal/green with clapperboard
+    director: `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="di_b" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#031a18"/><stop offset="100%" stop-color="#010808"/></linearGradient><linearGradient id="di_lid" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#053a35"/><stop offset="100%" stop-color="#031a18"/></linearGradient><linearGradient id="di_bar" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00f5c8"/><stop offset="100%" stop-color="#0066ff"/></linearGradient></defs>
+    <rect x="8" y="46" width="74" height="38" rx="7" fill="url(#di_b)" stroke="#0a6a60" stroke-width="1.5"/>
+    <rect x="6" y="26" width="78" height="26" rx="7" fill="url(#di_lid)" stroke="#0d9488" stroke-width="1.5"/>
+    <rect x="6" y="26" width="78" height="7" rx="7" fill="#00f5c8" opacity=".25"/>
+    <rect x="6" y="48" width="78" height="6" rx="2" fill="#0a6a60" opacity=".9"/>
+    <!-- clapperboard body --><rect x="25" y="28" width="40" height="20" rx="3" fill="#111" stroke="#00f5c8" stroke-width="1"/>
+    <!-- clapperboard stripes --><path d="M25 32 L35 28 M33 32 L43 28 M41 32 L51 28 M49 32 L59 28 M57 32 L65 28" stroke="#fff" stroke-width="2" opacity=".6"/>
+    <!-- play btn --><polygon points="38,37 38,43 50,40" fill="url(#di_bar)"/>
+    <!-- tech dots --><circle cx="14" cy="55" r="2.5" fill="#00f5c8" opacity=".5"/><circle cx="76" cy="55" r="2.5" fill="#00f5c8" opacity=".5"/>
+    <!-- lock --><rect x="38" y="52" width="14" height="11" rx="3" fill="#054a44"/><path d="M41 52 C41 47 49 47 49 52" fill="none" stroke="#00f5c8" stroke-width="2.5" stroke-linecap="round"/>
+    <ellipse cx="45" cy="84" rx="28" ry="4" fill="#00f5c8" opacity=".12"/></svg>`,
+
+    // DAILY GIFT — green with FREE gift box
+    daily: `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="dg_b" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a2010"/><stop offset="100%" stop-color="#030a04"/></linearGradient><linearGradient id="dg_lid" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a4a20"/><stop offset="100%" stop-color="#0d2810"/></linearGradient><linearGradient id="dg_bow" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4ade80"/><stop offset="100%" stop-color="#22c55e"/></linearGradient></defs>
+    <rect x="8" y="46" width="74" height="38" rx="7" fill="url(#dg_b)" stroke="#1a5a22" stroke-width="1.5"/>
+    <rect x="6" y="26" width="78" height="26" rx="7" fill="url(#dg_lid)" stroke="#22aa44" stroke-width="1.5"/>
+    <rect x="6" y="26" width="78" height="7" rx="7" fill="#22c55e" opacity=".35"/>
+    <rect x="6" y="48" width="78" height="6" rx="2" fill="#22aa44" opacity=".9"/>
+    <!-- gift box --><rect x="26" y="30" width="38" height="24" rx="3" fill="#14532d" stroke="#4ade80" stroke-width="1.2"/>
+    <!-- ribbon H --><rect x="42" y="30" width="6" height="24" fill="#22c55e" opacity=".8"/>
+    <!-- ribbon V --><rect x="26" y="40" width="38" height="6" fill="#22c55e" opacity=".8"/>
+    <!-- bow loops --><path d="M42 36 C38 28 28 28 30 34 C32 38 40 37 42 36Z" fill="url(#dg_bow)"/><path d="M48 36 C52 28 62 28 60 34 C58 38 50 37 48 36Z" fill="url(#dg_bow)"/>
+    <!-- FREE tag --><rect x="28" y="56" width="34" height="13" rx="4" fill="#14532d" stroke="#4ade80" stroke-width="1"/><text x="45" y="66" text-anchor="middle" font-size="8" font-weight="900" fill="#4ade80" font-family="sans-serif">FREE</text>
+    <ellipse cx="45" cy="84" rx="28" ry="4" fill="#22c55e" opacity=".12"/></svg>`,
+
+    // LOVE BOX — deep red with heart
+    love: `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="lv_b" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a040a"/><stop offset="100%" stop-color="#080102"/></linearGradient><linearGradient id="lv_lid" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4a0a1a"/><stop offset="100%" stop-color="#280510"/></linearGradient></defs>
+    <rect x="8" y="46" width="74" height="38" rx="7" fill="url(#lv_b)" stroke="#8a1128" stroke-width="1.5"/>
+    <rect x="6" y="26" width="78" height="26" rx="7" fill="url(#lv_lid)" stroke="#cc1a38" stroke-width="1.5"/>
+    <rect x="6" y="26" width="78" height="7" rx="7" fill="#e11d48" opacity=".4"/>
+    <rect x="6" y="48" width="78" height="6" rx="2" fill="#8a1128" opacity=".9"/>
+    <!-- heart --><path d="M45 50 C45 50 20 38 20 27 C20 20 26 15 32 15 C37 15 42 18 45 23 C48 18 53 15 58 15 C64 15 70 20 70 27 C70 38 45 50 45 50Z" fill="#e11d48" opacity=".95"/>
+    <!-- heart highlight --><path d="M31 19 C27 19 24 22 24 26 C24 29 26 32 29 35" fill="none" stroke="#fda4af" stroke-width="2.5" stroke-linecap="round" opacity=".55"/>
+    <!-- small hearts --><text x="16" y="37" font-size="9" opacity=".5">♥</text><text x="70" y="35" font-size="7" opacity=".4">♥</text>
+    <!-- lock --><rect x="38" y="52" width="14" height="11" rx="3" fill="#6a0a1e"/><path d="M41 52 C41 47 49 47 49 52" fill="none" stroke="#e11d48" stroke-width="2.5" stroke-linecap="round"/>
+    <ellipse cx="45" cy="84" rx="28" ry="4" fill="#e11d48" opacity=".12"/></svg>`,
+
+    // FOREST BOX — green with trees
+    space: `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="fs_b" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#061508"/><stop offset="100%" stop-color="#020802"/></linearGradient><linearGradient id="fs_lid" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#143520"/><stop offset="100%" stop-color="#061508"/></linearGradient></defs>
+    <rect x="8" y="46" width="74" height="38" rx="7" fill="url(#fs_b)" stroke="#1a5a22" stroke-width="1.5"/>
+    <rect x="6" y="26" width="78" height="26" rx="7" fill="url(#fs_lid)" stroke="#228833" stroke-width="1.5"/>
+    <rect x="6" y="26" width="78" height="7" rx="7" fill="#22aa44" opacity=".3"/>
+    <rect x="6" y="48" width="78" height="6" rx="2" fill="#1a5a22" opacity=".9"/>
+    <!-- trees --><polygon points="30,48 22,48 26,38" fill="#2d6a4f"/><polygon points="30,42 21,42 25.5,30" fill="#40916c"/><rect x="24.5" y="48" width="3" height="5" fill="#5c4033"/>
+    <polygon points="50,48 42,48 46,38" fill="#2d6a4f"/><polygon points="50,42 41,42 45.5,29" fill="#52b788"/><rect x="44.5" y="48" width="3" height="5" fill="#5c4033"/>
+    <polygon points="70,48 62,48 66,38" fill="#2d6a4f"/><polygon points="70,42 61,42 65.5,30" fill="#40916c"/><rect x="64.5" y="48" width="3" height="5" fill="#5c4033"/>
+    <!-- lock --><rect x="38" y="52" width="14" height="11" rx="3" fill="#143520"/><path d="M41 52 C41 47 49 47 49 52" fill="none" stroke="#52b788" stroke-width="2.5" stroke-linecap="round"/>
+    <ellipse cx="45" cy="84" rx="28" ry="4" fill="#22aa44" opacity=".12"/></svg>`,
+
+    // ROYAL BOX — gold/purple with crown
+    royal: `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="ry_b" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#140a28"/><stop offset="100%" stop-color="#060210"/></linearGradient><linearGradient id="ry_lid" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2e1050"/><stop offset="100%" stop-color="#140a28"/></linearGradient><linearGradient id="ry_crown" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fde68a"/><stop offset="100%" stop-color="#b45309"/></linearGradient></defs>
+    <rect x="8" y="46" width="74" height="38" rx="7" fill="url(#ry_b)" stroke="#4a1880" stroke-width="1.5"/>
+    <rect x="6" y="26" width="78" height="26" rx="7" fill="url(#ry_lid)" stroke="#7c3aed" stroke-width="1.5"/>
+    <rect x="6" y="26" width="78" height="7" rx="7" fill="#9333ea" opacity=".35"/>
+    <rect x="6" y="48" width="78" height="6" rx="2" fill="#4a1880" opacity=".9"/>
+    <!-- crown --><path d="M16 46 L16 30 L26 40 L45 18 L64 40 L74 30 L74 46 Z" fill="url(#ry_crown)" opacity=".97"/>
+    <!-- gems on crown --><circle cx="45" cy="18" r="4.5" fill="#fbbf24"/><circle cx="45" cy="18" r="2" fill="#fff" opacity=".6"/>
+    <circle cx="16" cy="30" r="3.5" fill="#fbbf24"/><circle cx="74" cy="30" r="3.5" fill="#fbbf24"/>
+    <!-- purple gems --><circle cx="30" cy="44" r="3" fill="#c084fc"/><circle cx="60" cy="44" r="3" fill="#c084fc"/>
+    <!-- lock --><rect x="38" y="52" width="14" height="11" rx="3" fill="#2e1050"/><path d="M41 52 C41 47 49 47 49 52" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
+    <ellipse cx="45" cy="84" rx="28" ry="4" fill="#9333ea" opacity=".12"/></svg>`,
+
+    // CRYPTO BOX — deep blue/purple with diamond
+    crypto: `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="cp_b" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a0620"/><stop offset="100%" stop-color="#030110"/></linearGradient><linearGradient id="cp_lid" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a0e45"/><stop offset="100%" stop-color="#0a0620"/></linearGradient><linearGradient id="cp_gem" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#c084fc"/><stop offset="100%" stop-color="#6d28d9"/></linearGradient></defs>
+    <rect x="8" y="46" width="74" height="38" rx="7" fill="url(#cp_b)" stroke="#3a148a" stroke-width="1.5"/>
+    <rect x="6" y="26" width="78" height="26" rx="7" fill="url(#cp_lid)" stroke="#6a2abf" stroke-width="1.5"/>
+    <rect x="6" y="26" width="78" height="7" rx="7" fill="#7c3aed" opacity=".3"/>
+    <rect x="6" y="48" width="78" height="6" rx="2" fill="#3a148a" opacity=".9"/>
+    <!-- crystal/diamond --><polygon points="45,18 62,33 55,50 35,50 28,33" fill="url(#cp_gem)" opacity=".95"/>
+    <polygon points="45,18 62,33 45,33" fill="#d8b4fe" opacity=".4"/>
+    <polygon points="45,50 62,33 45,33" fill="#4c1d95" opacity=".5"/>
+    <polygon points="45,50 28,33 45,33" fill="#3b0764" opacity=".5"/>
+    <polygon points="45,18 28,33 45,33" fill="#a855f7" opacity=".4"/>
+    <!-- sparkles --><circle cx="62" cy="33" r="2" fill="#fff" opacity=".5"/><circle cx="45" cy="18" r="2" fill="#fff" opacity=".6"/>
+    <!-- lock --><rect x="38" y="52" width="14" height="11" rx="3" fill="#2a0870"/><path d="M41 52 C41 47 49 47 49 52" fill="none" stroke="#c084fc" stroke-width="2.5" stroke-linecap="round"/>
+    <ellipse cx="45" cy="84" rx="28" ry="4" fill="#7c3aed" opacity=".12"/></svg>`,
+
+    // GHOST BOX — grey/white with cute ghost
+    ghost: `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gh_b" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0e1020"/><stop offset="100%" stop-color="#040508"/></linearGradient><linearGradient id="gh_lid" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1e2238"/><stop offset="100%" stop-color="#0e1020"/></linearGradient></defs>
+    <rect x="8" y="46" width="74" height="38" rx="7" fill="url(#gh_b)" stroke="#2a3050" stroke-width="1.5"/>
+    <rect x="6" y="26" width="78" height="26" rx="7" fill="url(#gh_lid)" stroke="#3a4470" stroke-width="1.5"/>
+    <rect x="6" y="26" width="78" height="7" rx="7" fill="#4a5480" opacity=".3"/>
+    <rect x="6" y="48" width="78" height="6" rx="2" fill="#2a3050" opacity=".9"/>
+    <!-- ghost body --><path d="M27 50 L27 30 C27 20 37 14 45 14 C53 14 63 20 63 30 L63 50 L56 44 L49 50 L45 44 L41 50 L34 44 Z" fill="#dde3f0" opacity=".96"/>
+    <!-- ghost eyes --><ellipse cx="37" cy="34" rx="4" ry="5" fill="#1e2238"/><ellipse cx="53" cy="34" rx="4" ry="5" fill="#1e2238"/>
+    <circle cx="38" cy="34" r="2" fill="#60a5fa"/><circle cx="54" cy="34" r="2" fill="#60a5fa"/>
+    <!-- ghost smile --><path d="M38 42 Q45 46 52 42" fill="none" stroke="#8892aa" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- lock --><rect x="38" y="52" width="14" height="11" rx="3" fill="#1e2238"/><path d="M41 52 C41 47 49 47 49 52" fill="none" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round"/>
+    <ellipse cx="45" cy="84" rx="28" ry="4" fill="#4a5480" opacity=".12"/></svg>`,
 };
 
 const RARITY_ORDER = ['common','uncommon','rare','epic','legendary'];
 const RARITY_NAMES = {common:'Обычный',uncommon:'Необычный',rare:'Редкий',epic:'Эпический',legendary:'Легендарный'};
 const ALL_GIFTS_LIST = Object.values(GIFTS);
 
+// ===== CASES — updated with real NFTs only =====
 const CASES = [
-    { id:'daily',  name:'Daily Gift',    icon:'daily',    price:0,   free:true, theme:'daily',    desc:'Бесплатный кейс с базовыми NFT подарками. Открывай каждый день!',
-      items:[{...GIFTS.deskcalendar,chance:22},{...GIFTS.bdaycandle,chance:18},{...GIFTS.gingercookie,chance:16},{...GIFTS.angrybirds,chance:12},{...GIFTS.toybear,chance:10},{...GIFTS.santahat,chance:8},{...GIFTS.homemadecake,chance:5},{...GIFTS.neoncat,chance:4},{...GIFTS.magicpotion,chance:3},{...GIFTS.jellybunny,chance:1.5},{...GIFTS.durovscap,chance:0.5}]},
-    { id:'love',   name:'Love Box',      icon:'love',     price:10,  theme:'love',     desc:'Романтические NFT. Любовь в каждом подарке!',
-      items:[{...GIFTS.gingercookie,chance:16},{...GIFTS.cookiejar,chance:14},{...GIFTS.spicedwine,chance:14},{...GIFTS.snowglobe,chance:13},{...GIFTS.berrybox,chance:12},{...GIFTS.kissedfrog,chance:10},{...GIFTS.eternalrose,chance:8},{...GIFTS.crystalball,chance:6},{...GIFTS.perfumebottle,chance:4},{...GIFTS.plushpepe,chance:3}]},
-    { id:'space',  name:'Forest Box',    icon:'space',    price:25,  theme:'space',    desc:'Лесные и магические NFT. Тайны природы внутри!',
-      items:[{...GIFTS.toybear,chance:18},{...GIFTS.berrybox,chance:15},{...GIFTS.snowglobe,chance:14},{...GIFTS.spyagaric,chance:13},{...GIFTS.magicpotion,chance:12},{...GIFTS.scaredcat,chance:10},{...GIFTS.vintagecigar,chance:8},{...GIFTS.preciouspeach,chance:5},{...GIFTS.durovscap,chance:3},{...GIFTS.diamondring,chance:2}]},
-    { id:'royal',  name:'Royal Box',     icon:'royal',    price:50,  theme:'royal',    desc:'Королевские NFT. Роскошь и изысканность!',
-      items:[{...GIFTS.heroichelmet,chance:18},{...GIFTS.homemadecake,chance:15},{...GIFTS.kissedfrog,chance:14},{...GIFTS.sharptongue,chance:12},{...GIFTS.signetring,chance:11},{...GIFTS.eternalrose,chance:10},{...GIFTS.astronaut,chance:8},{...GIFTS.perfumebottle,chance:5},{...GIFTS.durovscap,chance:5},{...GIFTS.thundergod,chance:2}]},
-    { id:'crypto', name:'Crypto Box',    icon:'crypto',   price:100, theme:'crypto',   desc:'Редчайшие NFT. Только для настоящих коллекционеров!',
-      items:[{...GIFTS.magicpotion,chance:18},{...GIFTS.spyagaric,chance:15},{...GIFTS.lasercat,chance:13},{...GIFTS.kissedfrog,chance:12},{...GIFTS.jellybunny,chance:11},{...GIFTS.vintagecigar,chance:10},{...GIFTS.signetring,chance:8},{...GIFTS.durovscap,chance:5},{...GIFTS.plushpepe,chance:4},{...GIFTS.genielamp,chance:4}]},
-    { id:'ghost',  name:'Ghost Box',     icon:'ghost',    price:35,  theme:'ghost',    desc:'Мистические NFT. Бу! Что скрывается внутри?',
-      items:[{...GIFTS.toybear,chance:20},{...GIFTS.snowglobe,chance:17},{...GIFTS.neoncat,chance:14},{...GIFTS.scaredcat,chance:13},{...GIFTS.magicpotion,chance:12},{...GIFTS.sharptongue,chance:10},{...GIFTS.jellybunny,chance:6},{...GIFTS.vintagecigar,chance:5},{...GIFTS.perfumebottle,chance:2},{...GIFTS.snoopcigar,chance:1}]},
-    { id:'ninja',  name:'Ninja Box',     icon:'ninja',    price:75,  theme:'ninja',    desc:'Скрытые NFT от мастера теней!',
-      items:[{...GIFTS.heroichelmet,chance:18},{...GIFTS.berrybox,chance:14},{...GIFTS.kissedfrog,chance:14},{...GIFTS.lasercat,chance:13},{...GIFTS.scaredcat,chance:12},{...GIFTS.spyagaric,chance:10},{...GIFTS.signetring,chance:8},{...GIFTS.preciouspeach,chance:6},{...GIFTS.durovscap,chance:3},{...GIFTS.diamondring,chance:2}]},
-    { id:'galaxy', name:'Galaxy Box',    icon:'galaxy',   price:200, theme:'galaxy',   desc:'Космические легендарные NFT. Из другой галактики!',
-      items:[{...GIFTS.lasercat,chance:14},{...GIFTS.astronaut,chance:14},{...GIFTS.jellybunny,chance:13},{...GIFTS.vintagecigar,chance:12},{...GIFTS.crystalball,chance:11},{...GIFTS.preciouspeach,chance:10},{...GIFTS.durovscap,chance:8},{...GIFTS.perfumebottle,chance:8},{...GIFTS.plushpepe,chance:6},{...GIFTS.thundergod,chance:4}]},
-    { id:'allin',  name:'All-In Box',    icon:'allin',    price:150, theme:'allin',    desc:'Ва-банк! Высокий риск — высокая награда. Легендарки ждут!',
-      items:[{...GIFTS.swisswatch,chance:17},{...GIFTS.lasercat,chance:14},{...GIFTS.astronaut,chance:13},{...GIFTS.snoopdogg,chance:12},{...GIFTS.jellybunny,chance:11},{...GIFTS.crystalball,chance:10},{...GIFTS.snoopcigar,chance:8},{...GIFTS.genielamp,chance:7},{...GIFTS.thundergod,chance:5},{...GIFTS.goldenpepe,chance:3}]},
-    { id:'cyber',  name:'Cyber Box',     icon:'cyber',    price:300, theme:'cyber',    desc:'Самый дорогой кейс. Топовые легендарки. Только для хардкорных!',
-      items:[{...GIFTS.snoopdogg,chance:14},{...GIFTS.swisswatch,chance:14},{...GIFTS.sakuraflower,chance:12},{...GIFTS.crystalball,chance:12},{...GIFTS.preciouspeach,chance:11},{...GIFTS.snoopcigar,chance:10},{...GIFTS.thundergod,chance:9},{...GIFTS.genielamp,chance:8},{...GIFTS.plushpepe,chance:6},{...GIFTS.goldenpepe,chance:4}]},
-    // NEW CASE — Director's Cut
-    { id:'director',name:"Director's Cut",icon:'director', price:500, theme:'director', desc:'Эксклюзивный кейс для элиты. Vault Key и Golden Pepe — высшая редкость!',
-      items:[{...GIFTS.snoopdogg,chance:14},{...GIFTS.crystalball,chance:13},{...GIFTS.astronaut,chance:13},{...GIFTS.thundergod,chance:12},{...GIFTS.genielamp,chance:11},{...GIFTS.plushpepe,chance:10},{...GIFTS.snoopcigar,chance:10},{...GIFTS.diamondring,chance:8},{...GIFTS.goldenpepe,chance:5},{...GIFTS.vaultkey,chance:4}]},
+    { id:'daily',  name:'Daily Gift',    icon:'daily',    price:0,   free:true, theme:'daily',
+      desc:'Бесплатный кейс с базовыми NFT подарками Telegram. Открывай каждый день!',
+      items:[
+        {...GIFTS.deskcalendar,chance:22},{...GIFTS.bdaycandle,chance:20},{...GIFTS.gingercookie,chance:17},
+        {...GIFTS.toybear,chance:14},{...GIFTS.cookiecup,chance:10},{...GIFTS.santahat,chance:7},
+        {...GIFTS.spicedwine,chance:5},{...GIFTS.snowglobe,chance:3},{...GIFTS.magicpotion,chance:1.5},
+        {...GIFTS.jellybunny,chance:0.4},{...GIFTS.durovscap,chance:0.1}
+      ]},
+    { id:'love',   name:'Love Box',      icon:'love',     price:8,   theme:'love',
+      desc:'Романтические NFT подарки Telegram. Любовь в каждом подарке!',
+      items:[
+        {...GIFTS.gingercookie,chance:18},{...GIFTS.snowglobe,chance:16},{...GIFTS.spicedwine,chance:14},
+        {...GIFTS.berrybox,chance:13},{...GIFTS.homemadecake,chance:12},{...GIFTS.eternalrose,chance:10},
+        {...GIFTS.kissedfrog,chance:8},{...GIFTS.vintagecigar,chance:5},{...GIFTS.perfumebottle,chance:3},
+        {...GIFTS.lolpop,chance:1}
+      ]},
+    { id:'space',  name:'Forest Box',    icon:'space',    price:20,  theme:'space',
+      desc:'Лесные и магические NFT подарки Telegram. Тайны природы внутри!',
+      items:[
+        {...GIFTS.toybear,chance:19},{...GIFTS.berrybox,chance:16},{...GIFTS.snowglobe,chance:14},
+        {...GIFTS.spyagaric,chance:13},{...GIFTS.magicpotion,chance:12},{...GIFTS.scaredcat,chance:10},
+        {...GIFTS.witchhat,chance:7},{...GIFTS.vintagecigar,chance:5},{...GIFTS.durovscap,chance:3},
+        {...GIFTS.diamondring,chance:1}
+      ]},
+    { id:'royal',  name:'Royal Box',     icon:'royal',    price:45,  theme:'royal',
+      desc:'Королевские NFT подарки Telegram. Роскошь и изысканность!',
+      items:[
+        {...GIFTS.homemadecake,chance:16},{...GIFTS.kissedfrog,chance:14},{...GIFTS.sharptongue,chance:13},
+        {...GIFTS.signetring,chance:12},{...GIFTS.eternalrose,chance:11},{...GIFTS.lolpop,chance:9},
+        {...GIFTS.swisswatch,chance:8},{...GIFTS.perfumebottle,chance:7},{...GIFTS.durovscap,chance:7},
+        {...GIFTS.genielamp,chance:3}
+      ]},
+    { id:'crypto', name:'Crypto Box',    icon:'crypto',   price:90,  theme:'crypto',
+      desc:'Редчайшие NFT подарки Telegram. Только для настоящих коллекционеров!',
+      items:[
+        {...GIFTS.magicpotion,chance:17},{...GIFTS.spyagaric,chance:15},{...GIFTS.evileye,chance:13},
+        {...GIFTS.kissedfrog,chance:13},{...GIFTS.jellybunny,chance:11},{...GIFTS.vintagecigar,chance:10},
+        {...GIFTS.signetring,chance:9},{...GIFTS.durovscap,chance:6},{...GIFTS.plushpepe,chance:4},
+        {...GIFTS.genielamp,chance:2}
+      ]},
+    { id:'ghost',  name:'Ghost Box',     icon:'ghost',    price:30,  theme:'ghost',
+      desc:'Мистические NFT подарки. Бу! Что скрывается внутри?',
+      items:[
+        {...GIFTS.toybear,chance:19},{...GIFTS.snowglobe,chance:17},{...GIFTS.witchhat,chance:14},
+        {...GIFTS.scaredcat,chance:13},{...GIFTS.magicpotion,chance:12},{...GIFTS.sharptongue,chance:10},
+        {...GIFTS.jellybunny,chance:6},{...GIFTS.vintagecigar,chance:5},{...GIFTS.perfumebottle,chance:3},
+        {...GIFTS.snoopcigar,chance:1}
+      ]},
+    { id:'ninja',  name:'Ninja Box',     icon:'ninja',    price:65,  theme:'ninja',
+      desc:'Скрытые NFT подарки Telegram от мастера теней!',
+      items:[
+        {...GIFTS.berrybox,chance:16},{...GIFTS.kissedfrog,chance:14},{...GIFTS.scaredcat,chance:14},
+        {...GIFTS.spyagaric,chance:13},{...GIFTS.evileye,chance:12},{...GIFTS.signetring,chance:11},
+        {...GIFTS.preciouspeach,chance:9},{...GIFTS.swisswatch,chance:7},{...GIFTS.durovscap,chance:3},
+        {...GIFTS.diamondring,chance:1}
+      ]},
+    { id:'galaxy', name:'Galaxy Box',    icon:'galaxy',   price:180, theme:'galaxy',
+      desc:'Космические легендарные NFT Telegram. Из другой галактики!',
+      items:[
+        {...GIFTS.swisswatch,chance:14},{...GIFTS.jellybunny,chance:13},{...GIFTS.vintagecigar,chance:12},
+        {...GIFTS.preciouspeach,chance:11},{...GIFTS.lolpop,chance:11},{...GIFTS.durovscap,chance:10},
+        {...GIFTS.perfumebottle,chance:10},{...GIFTS.plushpepe,chance:7},{...GIFTS.snoopcigar,chance:7},
+        {...GIFTS.diamondring,chance:5}
+      ]},
+    { id:'allin',  name:'All-In Box',    icon:'allin',    price:130, theme:'allin',
+      desc:'Ва-банк! Высокий риск — высокая награда. Легендарки ждут!',
+      items:[
+        {...GIFTS.swisswatch,chance:15},{...GIFTS.snoopdogg,chance:14},{...GIFTS.jellybunny,chance:13},
+        {...GIFTS.signetring,chance:12},{...GIFTS.lolpop,chance:11},{...GIFTS.snoopcigar,chance:10},
+        {...GIFTS.genielamp,chance:9},{...GIFTS.durovscap,chance:8},{...GIFTS.diamondring,chance:5},
+        {...GIFTS.plushpepe,chance:3}
+      ]},
+    { id:'cyber',  name:'Cyber Box',     icon:'cyber',    price:270, theme:'cyber',
+      desc:'Топовый кейс Telegram NFT. Только легендарные дропы!',
+      items:[
+        {...GIFTS.snoopdogg,chance:14},{...GIFTS.swisswatch,chance:13},{...GIFTS.sakuraflower,chance:12},
+        {...GIFTS.preciouspeach,chance:12},{...GIFTS.lolpop,chance:11},{...GIFTS.snoopcigar,chance:11},
+        {...GIFTS.genielamp,chance:10},{...GIFTS.durovscap,chance:9},{...GIFTS.diamondring,chance:5},
+        {...GIFTS.plushpepe,chance:3}
+      ]},
+    { id:'director',name:"Director's Cut",icon:'director',price:450, theme:'director',
+      desc:'Эксклюзивный кейс для элиты. Plush Pepe и Diamond Ring — высшая редкость!',
+      items:[
+        {...GIFTS.snoopdogg,chance:14},{...GIFTS.preciouspeach,chance:13},{...GIFTS.lolpop,chance:12},
+        {...GIFTS.genielamp,chance:12},{...GIFTS.snoopcigar,chance:11},{...GIFTS.durovscap,chance:11},
+        {...GIFTS.perfumebottle,chance:10},{...GIFTS.diamondring,chance:9},{...GIFTS.plushpepe,chance:8}
+      ]},
 ];
 
 // ===== STATE =====
