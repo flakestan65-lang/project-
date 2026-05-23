@@ -2111,6 +2111,181 @@ function renderContractRecipes(){
     }).join('');
 }
 
+// ===== НЕДОСТАЮЩИЕ ADMIN ФУНКЦИИ =====
+// Вставь этот блок ПЕРЕД строкой: // ===== EVENTS =====
+
+// --- СЕБЕ (быстро) ---
+function adminGiveSelfAll() {
+    ALL_GIFTS_LIST.forEach(gift => {
+        const entry = { ...gift, id: Date.now() + Math.random(), from: 'Admin', date: new Date().toISOString() };
+        state.inventory.unshift(entry);
+        if (gift.rarity === 'legendary') state.stats.legendary++;
+    });
+    save(); render();
+    toast('🌈 Все NFT добавлены в инвентарь!');
+    adminLog('Все NFT выданы себе', 'success');
+}
+
+function adminSelfMaxStats() {
+    state.stats.opened = 9999;
+    state.stats.legendary = state.inventory.filter(i => i.rarity === 'legendary').length + 99;
+    if (!state.stats.upgrades) state.stats.upgrades = { total: 0, wins: 0 };
+    state.stats.upgrades.total = 999;
+    state.stats.upgrades.wins = 777;
+    state.stats.contracts = 99;
+    save(); render();
+    toast('📈 Максимальная статистика установлена!');
+    adminLog('Макс. статистика установлена', 'success');
+}
+
+function adminResetSelf() {
+    if (!confirm('Сбросить профиль? Весь прогресс будет удалён!')) return;
+    state.balance = 50.0;
+    state.inventory = [];
+    state.stats = { opened: 0, legendary: 0, bestDrop: null, bestCase: null, upgrades: { total: 0, wins: 0 }, contracts: 0 };
+    save(); render();
+    toast('🔄 Профиль сброшен!');
+    adminLog('Профиль сброшен', 'info');
+}
+
+// --- УПРАВЛЕНИЕ ИГРОКОМ ---
+async function adminResetUserStats() {
+    if (!loadedTargetId) { toast('⚠️ Загрузи игрока'); return; }
+    try {
+        loadedTargetData.stats = { opened: 0, legendary: 0, upgrades: { total: 0, wins: 0 }, contracts: 0 };
+        await fbSetUser(loadedTargetId, loadedTargetData);
+        toast(`✅ ID ${loadedTargetId}: статистика сброшена`);
+        adminLog(`ID ${loadedTargetId}: стата сброшена`, 'success');
+    } catch (e) { toast('❌ ' + e.message); adminLog('Ошибка: ' + e.message, 'error'); }
+}
+
+async function adminClearUserInventory() {
+    if (!loadedTargetId) { toast('⚠️ Загрузи игрока'); return; }
+    try {
+        loadedTargetData.inventory = [];
+        loadedTargetData.stats = { ...loadedTargetData.stats, legendary: 0 };
+        await fbSetUser(loadedTargetId, loadedTargetData);
+        document.getElementById('target-user-items-display').textContent = '0 предметов';
+        toast(`✅ ID ${loadedTargetId}: инвентарь очищен`);
+        adminLog(`ID ${loadedTargetId}: инвент. очищен`, 'success');
+    } catch (e) { toast('❌ ' + e.message); adminLog('Ошибка: ' + e.message, 'error'); }
+}
+
+async function adminTakeUserBalance() {
+    if (!loadedTargetId) { toast('⚠️ Загрузи игрока'); return; }
+    const val = parseFloat(document.getElementById('adm-take-balance').value);
+    if (isNaN(val) || val < 0) { toast('❌ Неверное значение'); return; }
+    try {
+        const nb = Math.max(0, (loadedTargetData.balance || 0) - val);
+        loadedTargetData.balance = nb;
+        await fbUpdateUser(loadedTargetId, { balance: nb });
+        document.getElementById('target-user-balance-display').textContent = '💎 ' + fmt(nb) + ' TON';
+        toast(`✅ ID ${loadedTargetId}: −${fmt(val)} TON`);
+        adminLog(`ID ${loadedTargetId}: −${fmt(val)} TON`, 'success');
+    } catch (e) { toast('❌ ' + e.message); adminLog('Ошибка: ' + e.message, 'error'); }
+}
+
+async function adminBanUser() {
+    if (!loadedTargetId) { toast('⚠️ Загрузи игрока'); return; }
+    try {
+        loadedTargetData.banned = true;
+        await fbUpdateUser(loadedTargetId, { banned: true });
+        toast(`🔒 ID ${loadedTargetId}: заблокирован`);
+        adminLog(`ID ${loadedTargetId}: ЗАБЛОКИРОВАН`, 'error');
+    } catch (e) { toast('❌ ' + e.message); }
+}
+
+async function adminUnbanUser() {
+    if (!loadedTargetId) { toast('⚠️ Загрузи игрока'); return; }
+    try {
+        loadedTargetData.banned = false;
+        await fbUpdateUser(loadedTargetId, { banned: false });
+        toast(`🔓 ID ${loadedTargetId}: разблокирован`);
+        adminLog(`ID ${loadedTargetId}: разблокирован`, 'success');
+    } catch (e) { toast('❌ ' + e.message); }
+}
+
+// --- BROADCAST ---
+async function adminBroadcastTon() {
+    const amount = parseFloat(document.getElementById('adm-broadcast-amount').value);
+    if (isNaN(amount) || amount <= 0) { toast('❌ Неверная сумма'); return; }
+    if (!fbConnected || !fbDb) { toast('❌ Firebase не подключён'); return; }
+    if (!confirm(`Добавить ${fmt(amount)} TON каждому игроку?`)) return;
+    try {
+        adminLog(`Рассылка ${fmt(amount)} TON...`, 'info');
+        const snap = await fbDb.ref('users').once('value');
+        const data = snap.val();
+        if (!data) { toast('Нет пользователей'); return; }
+        const ids = Object.keys(data);
+        let count = 0;
+        for (const id of ids) {
+            const cur = data[id];
+            if (!cur) continue;
+            const nb = (cur.balance || 0) + amount;
+            await fbDb.ref('users/' + id + '/balance').set(nb);
+            count++;
+        }
+        toast(`✅ Разослано ${fmt(amount)} TON × ${count} игроков`);
+        adminLog(`Рассылка: +${fmt(amount)} TON × ${count}`, 'success');
+    } catch (e) { toast('❌ ' + e.message); adminLog('Ошибка рассылки: ' + e.message, 'error'); }
+}
+
+// --- GLOBAL STATS ---
+async function adminLoadGlobalStats() {
+    if (!fbConnected || !fbDb) { toast('❌ Firebase не подключён'); return; }
+    try {
+        const snap = await fbDb.ref('users').once('value');
+        const data = snap.val();
+        if (!data) { toast('Нет данных'); return; }
+        const players = Object.values(data).filter(Boolean);
+        const totalUsers = players.length;
+        const totalBalance = players.reduce((s, p) => s + (p.balance || 0), 0);
+        const totalItems = players.reduce((s, p) => s + ((p.inventory || []).length), 0);
+        const totalOpens = players.reduce((s, p) => s + ((p.stats && p.stats.opened) || 0), 0);
+        const richest = players.reduce((best, p) => (!best || (p.balance || 0) > (best.balance || 0)) ? p : best, null);
+
+        const el = id => document.getElementById(id);
+        if (el('adm-global-users')) el('adm-global-users').textContent = totalUsers;
+        if (el('adm-global-balance')) el('adm-global-balance').textContent = fmt(totalBalance);
+        if (el('adm-global-items')) el('adm-global-items').textContent = totalItems;
+        if (el('adm-global-opens')) el('adm-global-opens').textContent = totalOpens;
+        if (el('adm-global-richest')) el('adm-global-richest').textContent = richest ? (richest.name || richest.username || 'Unknown') + ' · ' + fmt(richest.balance) + ' TON' : '—';
+
+        adminLog(`Стата загружена: ${totalUsers} игр., ${fmt(totalBalance)} TON`, 'success');
+        toast('✅ Глобальная статистика загружена');
+    } catch (e) { toast('❌ ' + e.message); adminLog('Ошибка: ' + e.message, 'error'); }
+}
+
+// --- GIVE ALL RARITIES (по 1 каждой) ---
+async function adminGiveAllRarities() {
+    if (!loadedTargetId) { toast('⚠️ Загрузи игрока'); return; }
+    try {
+        const inv = loadedTargetData.inventory || [];
+        const rarities = ['common', 'uncommon', 'rare', 'epic', 'legendary'];
+        rarities.forEach(r => {
+            const gift = ALL_GIFTS_LIST.find(g => g.rarity === r);
+            if (gift) inv.unshift({ ...gift, id: Date.now() + Math.random(), from: 'Admin', date: new Date().toISOString() });
+        });
+        loadedTargetData.inventory = inv;
+        await fbSetUser(loadedTargetId, loadedTargetData);
+        document.getElementById('target-user-items-display').textContent = inv.length + ' предметов';
+        toast(`🌈 ID ${loadedTargetId}: по 1 каждой редкости`);
+        adminLog(`ID ${loadedTargetId}: по 1 каждой редкости`, 'success');
+    } catch (e) { toast('❌ ' + e.message); adminLog('Ошибка: ' + e.message, 'error'); }
+}
+
+// --- EXPORT LOG ---
+function adminExportLog() {
+    const log = document.getElementById('adm-log');
+    if (!log) return;
+    const lines = Array.from(log.querySelectorAll('.admin-log-entry')).map(el => el.textContent).join('\n');
+    const blob = new Blob([lines], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'admin_log.txt'; a.click();
+    URL.revokeObjectURL(url);
+    toast('📥 Лог экспортирован');
+}
+
 // ===== EVENTS =====
 document.getElementById('btn-back').onclick       = hideCaseDetail;
 document.getElementById('btn-open').onclick       = doOpen;
