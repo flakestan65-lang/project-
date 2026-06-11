@@ -17,30 +17,14 @@
             touch-action: none;
         }
 
-        :root {
-            --bg-dark: #1a1a2e;
-            --bg-panel: #16213e;
-            --accent: #e94560;
-            --accent-light: #ff6b6b;
-            --gold: #f9a826;
-            --green: #16c79a;
-            --blue: #118ab2;
-            --purple: #9b5de5;
-            --pink: #ef476f;
-            --cyan: #00bbf9;
-            --orange: #ff6b35;
-            --text: #ffffff;
-            --text-dim: #a0a0c0;
-        }
-
         body {
             font-family: 'Nunito', sans-serif;
-            background: linear-gradient(180deg, #0d0d1a 0%, #1a1a3e 30%, #16213e 100%);
+            background: linear-gradient(180deg, #1a1a3e 0%, #16213e 50%, #0f3460 100%);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            color: var(--text);
+            color: #fff;
             overflow: hidden;
             position: relative;
             touch-action: none;
@@ -49,10 +33,8 @@
         /* ===== МЕНЮ ===== */
         .menu-screen {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background: linear-gradient(180deg, #0d0d1a 0%, #1a1a3e 50%, #16213e 100%);
             display: flex;
             flex-direction: column;
@@ -69,73 +51,54 @@
         }
 
         .game-title {
-            font-size: 56px;
+            font-size: 52px;
             font-weight: 900;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             background: linear-gradient(135deg, #e94560, #ff6b6b, #f9a826);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            text-shadow: none;
             letter-spacing: 2px;
         }
 
         .game-subtitle {
-            font-size: 16px;
-            color: var(--text-dim);
-            margin-bottom: 50px;
+            font-size: 14px;
+            color: #a0a0c0;
+            margin-bottom: 40px;
             letter-spacing: 3px;
             text-transform: uppercase;
         }
 
         .menu-btn {
-            width: 280px;
-            padding: 18px 40px;
-            margin: 10px 0;
+            width: 260px;
+            padding: 16px 36px;
+            margin: 8px 0;
             border: none;
-            border-radius: 16px;
-            font-size: 20px;
+            border-radius: 14px;
+            font-size: 18px;
             font-weight: 700;
             font-family: 'Nunito', sans-serif;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 2px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .menu-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .menu-btn:hover::before {
-            left: 100%;
         }
 
         .menu-btn-primary {
             background: linear-gradient(135deg, #e94560, #ff6b6b);
             color: #fff;
-            box-shadow: 0 8px 30px rgba(233, 69, 96, 0.4);
+            box-shadow: 0 8px 25px rgba(233, 69, 96, 0.4);
         }
 
         .menu-btn-primary:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 12px 40px rgba(233, 69, 96, 0.5);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 12px 35px rgba(233, 69, 96, 0.5);
         }
 
         .menu-btn-secondary {
             background: rgba(255, 255, 255, 0.08);
             color: #fff;
             border: 2px solid rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
         }
 
         .menu-btn-secondary:hover {
@@ -145,23 +108,23 @@
         }
 
         .menu-stats {
-            margin-top: 40px;
+            margin-top: 30px;
             text-align: center;
         }
 
         .menu-stats-label {
-            font-size: 14px;
-            color: var(--text-dim);
+            font-size: 12px;
+            color: #a0a0c0;
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .menu-stats-value {
-            font-size: 36px;
+            font-size: 32px;
             font-weight: 800;
-            color: var(--gold);
-            text-shadow: 0 0 20px rgba(249, 168, 38, 0.3);
+            color: #f9a826;
+            text-shadow: 0 0 15px rgba(249, 168, 38, 0.3);
         }
 
         /* ===== ИГРОВОЙ ЭКРАН ===== */
@@ -170,8 +133,8 @@
             flex-direction: column;
             align-items: center;
             width: 100%;
-            max-width: 480px;
-            padding: 10px;
+            max-width: 460px;
+            padding: 8px;
             height: 100vh;
             justify-content: space-between;
         }
@@ -185,17 +148,17 @@
             justify-content: space-between;
             align-items: center;
             width: 100%;
-            padding: 10px 5px;
+            padding: 8px 5px;
         }
 
         .back-btn {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
             background: rgba(255, 255, 255, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: #fff;
-            font-size: 20px;
+            font-size: 18px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -205,7 +168,6 @@
 
         .back-btn:hover {
             background: rgba(255, 255, 255, 0.15);
-            transform: scale(1.05);
         }
 
         .score-display {
@@ -213,18 +175,17 @@
         }
 
         .score-label {
-            font-size: 12px;
-            color: var(--text-dim);
+            font-size: 11px;
+            color: #a0a0c0;
             text-transform: uppercase;
             letter-spacing: 2px;
         }
 
         .score-value {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 800;
             color: #fff;
-            text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
-            transition: transform 0.2s ease;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
         }
 
         .score-value.pop {
@@ -233,7 +194,7 @@
 
         @keyframes scorePop {
             0% { transform: scale(1); }
-            50% { transform: scale(1.3); color: var(--gold); }
+            50% { transform: scale(1.3); color: #f9a826; }
             100% { transform: scale(1); }
         }
 
@@ -242,28 +203,26 @@
         }
 
         .highscore-label {
-            font-size: 10px;
-            color: var(--text-dim);
+            font-size: 9px;
+            color: #a0a0c0;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
 
         .highscore-value {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
-            color: var(--gold);
+            color: #f9a826;
         }
 
         /* ===== ДОСКА ===== */
         .board-wrapper {
             position: relative;
-            padding: 12px;
+            padding: 10px;
             background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-            border-radius: 20px;
+            border-radius: 16px;
             border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 
-                0 20px 60px rgba(0, 0, 0, 0.5),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
 
         .board {
@@ -271,84 +230,78 @@
             grid-template-columns: repeat(8, 1fr);
             grid-template-rows: repeat(8, 1fr);
             gap: 3px;
-            width: min(380px, 90vw);
-            height: min(380px, 90vw);
-            position: relative;
+            width: min(360px, 88vw);
+            height: min(360px, 88vw);
         }
 
         .cell {
             background: rgba(255, 255, 255, 0.04);
-            border-radius: 8px;
+            border-radius: 6px;
             transition: all 0.15s ease;
-            position: relative;
             border: 1px solid rgba(255, 255, 255, 0.03);
         }
 
         .cell.filled {
             border: none;
-            box-shadow: 
-                inset 0 2px 4px rgba(255, 255, 255, 0.25),
-                0 2px 8px rgba(0, 0, 0, 0.3),
-                0 0 15px var(--cell-glow, transparent);
+            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.25), 0 2px 6px rgba(0, 0, 0, 0.3);
         }
 
         .cell.preview {
-            opacity: 0.35;
-            transform: scale(0.92);
+            opacity: 0.4;
+            transform: scale(0.9);
             border: 2px dashed rgba(255, 255, 255, 0.3);
         }
 
         .cell.preview-valid {
-            opacity: 0.6;
+            opacity: 0.7;
             transform: scale(0.95);
             border: 2px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 0 15px var(--cell-glow, transparent);
+            box-shadow: 0 0 12px var(--cell-glow, transparent);
         }
 
         .cell.clearing {
-            animation: cellClear 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation: cellClear 0.5s ease forwards;
         }
 
         @keyframes cellClear {
             0% { transform: scale(1); opacity: 1; }
-            30% { transform: scale(1.15); opacity: 0.9; }
+            30% { transform: scale(1.2); opacity: 0.9; }
             100% { transform: scale(0); opacity: 0; }
         }
 
         /* ===== ПАНЕЛЬ ФИГУР ===== */
         .pieces-panel {
             width: 100%;
-            padding: 15px;
+            padding: 12px;
             background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
-            border-radius: 20px;
+            border-radius: 16px;
             border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
         }
 
         .pieces-container {
             display: flex;
             justify-content: center;
-            gap: 12px;
-            min-height: 100px;
+            gap: 10px;
+            min-height: 90px;
             align-items: center;
         }
 
         .piece-slot {
-            width: 100px;
-            height: 100px;
+            width: 90px;
+            height: 90px;
             display: flex;
             align-items: center;
             justify-content: center;
             background: rgba(255, 255, 255, 0.03);
-            border-radius: 16px;
+            border-radius: 14px;
             border: 2px dashed rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
         }
 
         .piece-slot.active {
-            border-color: rgba(255, 255, 255, 0.25);
-            background: rgba(255, 255, 255, 0.06);
-            box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .piece-slot.empty {
@@ -359,80 +312,41 @@
             display: grid;
             gap: 2px;
             cursor: grab;
-            transition: transform 0.1s ease;
             touch-action: none;
-            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
-        }
-
-        .piece:active {
-            cursor: grabbing;
+            filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
         }
 
         .piece.dragging {
             position: fixed;
             z-index: 10000;
             pointer-events: none;
-            transform: scale(1.15);
-            filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.5));
+            transform: scale(1.12);
+            filter: drop-shadow(0 12px 25px rgba(0, 0, 0, 0.5));
             transition: none;
         }
 
         .piece-cell {
-            width: 24px;
-            height: 24px;
-            border-radius: 6px;
-            box-shadow: 
-                inset 0 1px 2px rgba(255, 255, 255, 0.4),
-                0 1px 3px rgba(0, 0, 0, 0.2);
+            width: 22px;
+            height: 22px;
+            border-radius: 5px;
+            box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.35), 0 1px 2px rgba(0, 0, 0, 0.2);
         }
 
-        .piece.used {
-            opacity: 0;
-            transform: scale(0);
-            pointer-events: none;
-        }
-
-        /* ===== ЦВЕТА БЛОКОВ ===== */
-        .color-0 { 
-            background: linear-gradient(135deg, #e94560, #ff6b6b); 
-            --cell-glow: rgba(233, 69, 96, 0.4);
-        }
-        .color-1 { 
-            background: linear-gradient(135deg, #f9a826, #ffd93d); 
-            --cell-glow: rgba(249, 168, 38, 0.4);
-        }
-        .color-2 { 
-            background: linear-gradient(135deg, #16c79a, #06d6a0); 
-            --cell-glow: rgba(22, 199, 154, 0.4);
-        }
-        .color-3 { 
-            background: linear-gradient(135deg, #118ab2, #06b6d4); 
-            --cell-glow: rgba(17, 138, 178, 0.4);
-        }
-        .color-4 { 
-            background: linear-gradient(135deg, #9b5de5, #c77dff); 
-            --cell-glow: rgba(155, 93, 229, 0.4);
-        }
-        .color-5 { 
-            background: linear-gradient(135deg, #ef476f, #ff8fa3); 
-            --cell-glow: rgba(239, 71, 111, 0.4);
-        }
-        .color-6 { 
-            background: linear-gradient(135deg, #00bbf9, #48cae4); 
-            --cell-glow: rgba(0, 187, 249, 0.4);
-        }
-        .color-7 { 
-            background: linear-gradient(135deg, #ff6b35, #ff9f43); 
-            --cell-glow: rgba(255, 107, 53, 0.4);
-        }
+        /* ===== ЦВЕТА БЛОКОВ (как в оригинале) ===== */
+        .color-0 { background: linear-gradient(135deg, #e94560, #ff6b6b); --cell-glow: rgba(233, 69, 96, 0.4); }
+        .color-1 { background: linear-gradient(135deg, #f9a826, #ffd93d); --cell-glow: rgba(249, 168, 38, 0.4); }
+        .color-2 { background: linear-gradient(135deg, #16c79a, #06d6a0); --cell-glow: rgba(22, 199, 154, 0.4); }
+        .color-3 { background: linear-gradient(135deg, #118ab2, #06b6d4); --cell-glow: rgba(17, 138, 178, 0.4); }
+        .color-4 { background: linear-gradient(135deg, #9b5de5, #c77dff); --cell-glow: rgba(155, 93, 229, 0.4); }
+        .color-5 { background: linear-gradient(135deg, #ef476f, #ff8fa3); --cell-glow: rgba(239, 71, 111, 0.4); }
+        .color-6 { background: linear-gradient(135deg, #00bbf9, #48cae4); --cell-glow: rgba(0, 187, 249, 0.4); }
+        .color-7 { background: linear-gradient(135deg, #ff6b35, #ff9f43); --cell-glow: rgba(255, 107, 53, 0.4); }
 
         /* ===== ЭКРАН ПРОИГРЫША ===== */
         .gameover-screen {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(10px);
             display: none;
@@ -450,20 +364,20 @@
         }
 
         .gameover-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
+            font-size: 70px;
+            margin-bottom: 15px;
             animation: iconBounce 1s ease infinite alternate;
         }
 
         @keyframes iconBounce {
-            from { transform: translateY(0) rotate(-5deg); }
-            to { transform: translateY(-15px) rotate(5deg); }
+            from { transform: translateY(0) rotate(-3deg); }
+            to { transform: translateY(-12px) rotate(3deg); }
         }
 
         .gameover-title {
-            font-size: 42px;
+            font-size: 36px;
             font-weight: 900;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             background: linear-gradient(135deg, #e94560, #ff6b6b);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -471,48 +385,48 @@
         }
 
         .gameover-subtitle {
-            font-size: 16px;
-            color: var(--text-dim);
-            margin-bottom: 30px;
+            font-size: 14px;
+            color: #a0a0c0;
+            margin-bottom: 25px;
         }
 
         .gameover-score-box {
             background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
-            border-radius: 20px;
-            padding: 25px 50px;
-            margin-bottom: 10px;
+            border-radius: 16px;
+            padding: 20px 40px;
+            margin-bottom: 8px;
             text-align: center;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .gameover-score-label {
-            font-size: 14px;
-            color: var(--text-dim);
+            font-size: 12px;
+            color: #a0a0c0;
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .gameover-score-value {
-            font-size: 48px;
+            font-size: 42px;
             font-weight: 900;
             color: #fff;
         }
 
         .gameover-best {
-            font-size: 16px;
-            color: var(--gold);
-            margin-bottom: 30px;
+            font-size: 14px;
+            color: #f9a826;
+            margin-bottom: 25px;
             font-weight: 600;
         }
 
         .gameover-btn {
-            width: 260px;
-            padding: 16px;
-            margin: 8px 0;
+            width: 240px;
+            padding: 14px;
+            margin: 6px 0;
             border: none;
-            border-radius: 14px;
-            font-size: 18px;
+            border-radius: 12px;
+            font-size: 16px;
             font-weight: 700;
             font-family: 'Nunito', sans-serif;
             cursor: pointer;
@@ -524,12 +438,11 @@
         .gameover-btn-primary {
             background: linear-gradient(135deg, #e94560, #ff6b6b);
             color: #fff;
-            box-shadow: 0 8px 25px rgba(233, 69, 96, 0.4);
+            box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4);
         }
 
         .gameover-btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 35px rgba(233, 69, 96, 0.5);
         }
 
         .gameover-btn-secondary {
@@ -545,36 +458,35 @@
         /* ===== ЭФФЕКТЫ ===== */
         .combo-text {
             position: fixed;
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 900;
-            color: var(--gold);
-            text-shadow: 0 0 30px rgba(249, 168, 38, 0.6);
+            color: #f9a826;
+            text-shadow: 0 0 20px rgba(249, 168, 38, 0.5);
             pointer-events: none;
             z-index: 9000;
-            animation: comboAnim 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation: comboAnim 1s ease forwards;
             white-space: nowrap;
         }
 
         @keyframes comboAnim {
             0% { transform: translateY(0) scale(0.3); opacity: 0; }
-            15% { transform: translateY(-30px) scale(1.3); opacity: 1; }
-            40% { transform: translateY(-40px) scale(1.1); opacity: 1; }
-            100% { transform: translateY(-100px) scale(0.8); opacity: 0; }
+            15% { transform: translateY(-25px) scale(1.3); opacity: 1; }
+            100% { transform: translateY(-80px) scale(0.8); opacity: 0; }
         }
 
         .points-text {
             position: fixed;
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 800;
             color: #fff;
             pointer-events: none;
             z-index: 9000;
-            animation: pointsAnim 1s ease forwards;
+            animation: pointsAnim 0.8s ease forwards;
         }
 
         @keyframes pointsAnim {
             0% { transform: translateY(0); opacity: 1; }
-            100% { transform: translateY(-60px); opacity: 0; }
+            100% { transform: translateY(-50px); opacity: 0; }
         }
 
         .particles-container {
@@ -585,10 +497,10 @@
 
         .particle {
             position: absolute;
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            animation: particleBurst 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation: particleBurst 0.7s ease forwards;
         }
 
         @keyframes particleBurst {
@@ -596,25 +508,11 @@
             100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
         }
 
-        .shake {
-            animation: shake 0.4s ease;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-8px); }
-            40% { transform: translateX(8px); }
-            60% { transform: translateX(-4px); }
-            80% { transform: translateX(4px); }
-        }
-
         /* ===== НАСТРОЙКИ ===== */
         .settings-screen {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.9);
             backdrop-filter: blur(15px);
             display: none;
@@ -629,71 +527,65 @@
         }
 
         .settings-title {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 800;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .setting-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            width: 300px;
-            padding: 15px 20px;
-            margin: 8px 0;
+            width: 280px;
+            padding: 12px 18px;
+            margin: 6px 0;
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
+            border-radius: 10px;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .setting-label {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
         }
 
         .toggle {
-            width: 50px;
-            height: 26px;
+            width: 46px;
+            height: 24px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 13px;
+            border-radius: 12px;
             position: relative;
             cursor: pointer;
             transition: background 0.3s ease;
         }
 
         .toggle.active {
-            background: var(--green);
+            background: #16c79a;
         }
 
         .toggle-knob {
-            width: 22px;
-            height: 22px;
+            width: 20px;
+            height: 20px;
             background: #fff;
             border-radius: 50%;
             position: absolute;
             top: 2px;
             left: 2px;
             transition: left 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         .toggle.active .toggle-knob {
-            left: 26px;
+            left: 24px;
         }
 
         /* ===== АДАПТИВ ===== */
-        @media (max-width: 420px) {
-            .game-title { font-size: 42px; }
-            .board { width: 340px; height: 340px; }
-            .piece-cell { width: 20px; height: 20px; }
-            .piece-slot { width: 85px; height: 85px; }
-            .menu-btn { width: 240px; font-size: 18px; }
-        }
-
-        @media (max-width: 360px) {
-            .board { width: 300px; height: 300px; }
+        @media (max-width: 400px) {
+            .game-title { font-size: 40px; }
+            .board { width: 320px; height: 320px; }
             .piece-cell { width: 18px; height: 18px; }
-            .piece-slot { width: 75px; height: 75px; }
+            .piece-slot { width: 80px; height: 80px; }
+            .menu-btn { width: 220px; font-size: 16px; }
         }
     </style>
 </head>
@@ -715,17 +607,13 @@
         <div class="settings-title">Настройки</div>
         <div class="setting-row">
             <span class="setting-label">Звук</span>
-            <div class="toggle active" id="toggleSound">
-                <div class="toggle-knob"></div>
-            </div>
+            <div class="toggle active" id="toggleSound"><div class="toggle-knob"></div></div>
         </div>
         <div class="setting-row">
             <span class="setting-label">Вибрация</span>
-            <div class="toggle active" id="toggleVibro">
-                <div class="toggle-knob"></div>
-            </div>
+            <div class="toggle active" id="toggleVibro"><div class="toggle-knob"></div></div>
         </div>
-        <button class="menu-btn menu-btn-secondary" id="btnBackSettings" style="margin-top:30px;width:200px;">Назад</button>
+        <button class="menu-btn menu-btn-secondary" id="btnBackSettings" style="margin-top:25px;width:180px;">Назад</button>
     </div>
 
     <!-- ===== ИГРОВОЙ ЭКРАН ===== -->
@@ -777,22 +665,16 @@
         let vibroEnabled = true;
 
         function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new AudioContext();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
         }
 
         function playSound(type) {
             if (!soundEnabled || !audioCtx) return;
-            
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
             gain.connect(audioCtx.destination);
-            
             const now = audioCtx.currentTime;
             
             switch(type) {
@@ -802,8 +684,7 @@
                     osc.frequency.exponentialRampToValueAtTime(700, now + 0.08);
                     gain.gain.setValueAtTime(0.15, now);
                     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-                    osc.start(now);
-                    osc.stop(now + 0.1);
+                    osc.start(now); osc.stop(now + 0.1);
                     break;
                 case 'place':
                     osc.type = 'sine';
@@ -811,8 +692,7 @@
                     osc.frequency.exponentialRampToValueAtTime(450, now + 0.12);
                     gain.gain.setValueAtTime(0.2, now);
                     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-                    osc.start(now);
-                    osc.stop(now + 0.15);
+                    osc.start(now); osc.stop(now + 0.15);
                     break;
                 case 'clear':
                     osc.type = 'sine';
@@ -821,19 +701,16 @@
                     osc.frequency.setValueAtTime(800, now + 0.2);
                     gain.gain.setValueAtTime(0.25, now);
                     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-                    osc.start(now);
-                    osc.stop(now + 0.3);
+                    osc.start(now); osc.stop(now + 0.3);
                     break;
                 case 'combo':
                     osc.type = 'square';
                     osc.frequency.setValueAtTime(300, now);
                     osc.frequency.setValueAtTime(500, now + 0.08);
                     osc.frequency.setValueAtTime(700, now + 0.16);
-                    osc.frequency.setValueAtTime(900, now + 0.24);
                     gain.gain.setValueAtTime(0.15, now);
-                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
-                    osc.start(now);
-                    osc.stop(now + 0.4);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                    osc.start(now); osc.stop(now + 0.35);
                     break;
                 case 'gameover':
                     osc.type = 'sawtooth';
@@ -841,8 +718,7 @@
                     osc.frequency.exponentialRampToValueAtTime(80, now + 0.6);
                     gain.gain.setValueAtTime(0.15, now);
                     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.7);
-                    osc.start(now);
-                    osc.stop(now + 0.7);
+                    osc.start(now); osc.stop(now + 0.7);
                     break;
                 case 'error':
                     osc.type = 'sawtooth';
@@ -850,93 +726,86 @@
                     osc.frequency.exponentialRampToValueAtTime(100, now + 0.15);
                     gain.gain.setValueAtTime(0.1, now);
                     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-                    osc.start(now);
-                    osc.stop(now + 0.15);
+                    osc.start(now); osc.stop(now + 0.15);
                     break;
             }
         }
 
         function vibrate(pattern) {
-            if (vibroEnabled && navigator.vibrate) {
-                navigator.vibrate(pattern);
-            }
+            if (vibroEnabled && navigator.vibrate) navigator.vibrate(pattern);
         }
 
-        // ==================== ИГРОВЫЕ ДАННЫЕ ====================
+        // ==================== ТОЛЬКО ФИГУРЫ ИЗ ОРИГИНАЛЬНОГО BLOCK BLAST ====================
         const BOARD_SIZE = 8;
         const PIECES_COUNT = 3;
         
+        // Фигуры из оригинального BlockBlast (точные формы)
         const PIECE_DEFINITIONS = [
-            { shape: [[1]], color: 0, weight: 8 },
-            { shape: [[1,1]], color: 1, weight: 8 },
-            { shape: [[1],[1]], color: 2, weight: 8 },
-            { shape: [[1,1,1]], color: 3, weight: 7 },
-            { shape: [[1],[1],[1]], color: 4, weight: 7 },
-            { shape: [[1,0],[1,1]], color: 5, weight: 6 },
-            { shape: [[0,1],[1,1]], color: 6, weight: 6 },
-            { shape: [[1,1,1,1]], color: 0, weight: 5 },
-            { shape: [[1],[1],[1],[1]], color: 1, weight: 5 },
-            { shape: [[1,1],[1,1]], color: 2, weight: 6 },
-            { shape: [[1,1,1],[0,1,0]], color: 3, weight: 5 },
-            { shape: [[0,1,0],[1,1,1]], color: 4, weight: 5 },
-            { shape: [[1,0,0],[1,1,1]], color: 5, weight: 5 },
-            { shape: [[0,0,1],[1,1,1]], color: 6, weight: 5 },
-            { shape: [[0,1,1],[1,1,0]], color: 7, weight: 5 },
-            { shape: [[1,1,0],[0,1,1]], color: 0, weight: 5 },
-            { shape: [[1,1,1,1,1]], color: 1, weight: 3 },
-            { shape: [[1],[1],[1],[1],[1]], color: 2, weight: 3 },
-            { shape: [[0,1,0],[1,1,1],[0,1,0]], color: 3, weight: 3 },
-            { shape: [[1,1,1],[1,1,1]], color: 4, weight: 4 },
-            { shape: [[1,1],[1,1],[1,1]], color: 5, weight: 4 },
-            { shape: [[1,0,0],[1,0,0],[1,1,1]], color: 6, weight: 3 },
-            { shape: [[0,0,1],[0,0,1],[1,1,1]], color: 7, weight: 3 },
-            { shape: [[1,1,0],[0,1,1],[0,0,1]], color: 0, weight: 3 },
+            // Мономино (1 блок)
+            { shape: [[1]], color: 0 },
+            // Домино горизонтальное (2 блока)
+            { shape: [[1,1]], color: 1 },
+            // Домино вертикальное (2 блока)
+            { shape: [[1],[1]], color: 2 },
+            // Тромино I горизонтальное (3 блока)
+            { shape: [[1,1,1]], color: 3 },
+            // Тромино I вертикальное (3 блока)
+            { shape: [[1],[1],[1]], color: 4 },
+            // Тромино L (как на скриншоте — 3 блока в форме угла)
+            { shape: [[1,0],[1,1]], color: 5 },
+            // Тромино L зеркальный
+            { shape: [[0,1],[1,1]], color: 6 },
+            // Тетрамино I (4 блока горизонтально)
+            { shape: [[1,1,1,1]], color: 0 },
+            // Тетрамино I (4 блока вертикально)
+            { shape: [[1],[1],[1],[1]], color: 1 },
+            // Тетрамино O (2x2 квадрат)
+            { shape: [[1,1],[1,1]], color: 2 },
+            // Тетрамино T
+            { shape: [[1,1,1],[0,1,0]], color: 3 },
+            // Тетрамино L
+            { shape: [[1,0,0],[1,1,1]], color: 4 },
+            // Тетрамино J
+            { shape: [[0,0,1],[1,1,1]], color: 5 },
+            // Тетрамино S
+            { shape: [[0,1,1],[1,1,0]], color: 6 },
+            // Тетрамино Z
+            { shape: [[1,1,0],[0,1,1]], color: 7 },
+            // Пентамино (5 блоков горизонтально)
+            { shape: [[1,1,1,1,1]], color: 0 },
+            // Пентамино (5 блоков вертикально)
+            { shape: [[1],[1],[1],[1],[1]], color: 1 },
+            // Крест (5 блоков)
+            { shape: [[0,1,0],[1,1,1],[0,1,0]], color: 2 },
+            // Прямоугольник 2x3
+            { shape: [[1,1,1],[1,1,1]], color: 3 },
+            // Прямоугольник 3x2
+            { shape: [[1,1],[1,1],[1,1]], color: 4 },
+            // Большой L (3x3)
+            { shape: [[1,0,0],[1,0,0],[1,1,1]], color: 5 },
+            // Большой L зеркальный
+            { shape: [[0,0,1],[0,0,1],[1,1,1]], color: 6 },
         ];
 
         let board = [];
         let score = 0;
         let highScore = 0;
         let pieces = [];
-        let draggedPiece = null;
-        let dragElement = null;
-        let dragSlotIndex = -1;
         let isGameOver = false;
-        let isDragging = false;
-        let dragPointerId = null;
         let currentScreen = 'menu';
-
-        // ==================== УТИЛИТЫ ====================
-        function weightedRandom() {
-            const totalWeight = PIECE_DEFINITIONS.reduce((sum, p) => sum + p.weight, 0);
-            let random = Math.random() * totalWeight;
-            for (const piece of PIECE_DEFINITIONS) {
-                random -= piece.weight;
-                if (random <= 0) return piece;
-            }
-            return PIECE_DEFINITIONS[0];
-        }
-
-        function generateUniquePieces() {
-            const result = [];
-            const usedShapes = new Set();
-            
-            for (let i = 0; i < PIECES_COUNT; i++) {
-                let piece;
-                let attempts = 0;
-                do {
-                    piece = weightedRandom();
-                    attempts++;
-                } while (usedShapes.has(JSON.stringify(piece.shape)) && attempts < 30);
-                
-                usedShapes.add(JSON.stringify(piece.shape));
-                result.push({
-                    shape: piece.shape.map(row => [...row]),
-                    color: piece.color,
-                    used: false
-                });
-            }
-            return result;
-        }
+        
+        // Drag state
+        let dragState = {
+            active: false,
+            pieceIndex: -1,
+            element: null,
+            piece: null,
+            offsetX: 0,
+            offsetY: 0,
+            startX: 0,
+            startY: 0,
+            isTouch: false
+        };
 
         // ==================== ЭКРАНЫ ====================
         function showScreen(screen) {
@@ -944,10 +813,7 @@
             document.getElementById('menuScreen').classList.toggle('hidden', screen !== 'menu');
             document.getElementById('gameScreen').classList.toggle('active', screen === 'game');
             document.getElementById('settingsScreen').classList.remove('show');
-            
-            if (screen === 'menu') {
-                document.getElementById('menuHighScore').textContent = highScore;
-            }
+            if (screen === 'menu') document.getElementById('menuHighScore').textContent = highScore;
         }
 
         // ==================== ИНИЦИАЛИЗАЦИЯ ====================
@@ -960,9 +826,7 @@
 
         function loadHighScore() {
             const saved = localStorage.getItem('blockblast_highscore_v2');
-            if (saved) {
-                highScore = parseInt(saved);
-            }
+            if (saved) highScore = parseInt(saved);
             document.getElementById('menuHighScore').textContent = highScore;
             document.getElementById('highScoreValue').textContent = highScore;
         }
@@ -980,7 +844,6 @@
             board = Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null));
             const boardEl = document.getElementById('board');
             boardEl.innerHTML = '';
-            
             for (let r = 0; r < BOARD_SIZE; r++) {
                 for (let c = 0; c < BOARD_SIZE; c++) {
                     const cell = document.createElement('div');
@@ -1005,7 +868,24 @@
         }
 
         function generatePieces() {
-            pieces = generateUniquePieces();
+            pieces = [];
+            const usedShapes = new Set();
+            
+            for (let i = 0; i < PIECES_COUNT; i++) {
+                let def;
+                let attempts = 0;
+                do {
+                    def = PIECE_DEFINITIONS[Math.floor(Math.random() * PIECE_DEFINITIONS.length)];
+                    attempts++;
+                } while (usedShapes.has(JSON.stringify(def.shape)) && attempts < 50);
+                
+                usedShapes.add(JSON.stringify(def.shape));
+                pieces.push({
+                    shape: def.shape.map(row => [...row]),
+                    color: def.color,
+                    used: false
+                });
+            }
             renderPieces();
         }
 
@@ -1030,12 +910,11 @@
         function createPieceElement(piece, index) {
             const rows = piece.shape.length;
             const cols = piece.shape[0].length;
+            const cellSize = window.innerWidth < 420 ? 18 : 22;
             
             const el = document.createElement('div');
             el.className = 'piece';
             el.dataset.pieceIndex = index;
-            
-            const cellSize = window.innerWidth < 420 ? 20 : 24;
             el.style.gridTemplateColumns = `repeat(${cols}, ${cellSize}px)`;
             el.style.gridTemplateRows = `repeat(${rows}, ${cellSize}px)`;
             
@@ -1061,7 +940,6 @@
             cells.forEach(cell => {
                 const r = parseInt(cell.dataset.row);
                 const c = parseInt(cell.dataset.col);
-                
                 cell.className = 'cell';
                 if (board[r][c] !== null) {
                     cell.classList.add('filled', 'color-' + board[r][c]);
@@ -1071,8 +949,7 @@
 
         function showPreview(piece, startRow, startCol) {
             clearPreview();
-            
-            if (!piece || startRow === undefined || startCol === undefined) return;
+            if (!piece || startRow === undefined || startCol === undefined) return false;
             
             const isValid = canPlacePiece(piece, startRow, startCol);
             
@@ -1219,7 +1096,7 @@
             el.style.top = y + 'px';
             el.style.transform = 'translateX(-50%)';
             document.body.appendChild(el);
-            setTimeout(() => el.remove(), 1200);
+            setTimeout(() => el.remove(), 1000);
         }
 
         function showPointsText(points, x, y) {
@@ -1230,7 +1107,7 @@
             el.style.top = y + 'px';
             el.style.transform = 'translateX(-50%)';
             document.body.appendChild(el);
-            setTimeout(() => el.remove(), 1000);
+            setTimeout(() => el.remove(), 800);
         }
 
         function calculateScore(linesCount, cellsCleared) {
@@ -1242,7 +1119,7 @@
             return Math.floor(baseScore * multiplier);
         }
 
-        function updateScoreDisplay(animate = false) {
+        function updateScoreDisplay(animate) {
             const el = document.getElementById('scoreValue');
             el.textContent = score;
             if (animate) {
@@ -1257,9 +1134,7 @@
                 if (pieces[i] && !pieces[i].used) {
                     for (let r = 0; r < BOARD_SIZE; r++) {
                         for (let c = 0; c < BOARD_SIZE; c++) {
-                            if (canPlacePiece(pieces[i], r, c)) {
-                                return false;
-                            }
+                            if (canPlacePiece(pieces[i], r, c)) return false;
                         }
                     }
                 }
@@ -1280,7 +1155,7 @@
             }, 800);
         }
 
-        // ==================== DRAG AND DROP (ПОЛНОСТЬЮ ПЕРЕПИСАННЫЙ) ====================
+        // ==================== DRAG & DROP (ПОЛНОСТЬЮ ПЕРЕПИСАННЫЙ, РАБОТАЕТ С ПЕРВОГО РАЗА) ====================
         function getBoardCellFromPoint(clientX, clientY) {
             const boardEl = document.getElementById('board');
             const rect = boardEl.getBoundingClientRect();
@@ -1294,38 +1169,64 @@
             const col = Math.floor((clientX - rect.left) / cellSize);
             const row = Math.floor((clientY - rect.top) / cellSize);
             
-            return { row: Math.max(0, Math.min(row, BOARD_SIZE - 1)), 
-                     col: Math.max(0, Math.min(col, BOARD_SIZE - 1)) };
+            return { 
+                row: Math.max(0, Math.min(row, BOARD_SIZE - 1)), 
+                col: Math.max(0, Math.min(col, BOARD_SIZE - 1)) 
+            };
         }
 
-        function startDrag(e, pieceIndex) {
-            if (isGameOver || !pieces[pieceIndex] || pieces[pieceIndex].used) return;
-            if (isDragging) return; // Уже тащим что-то
+        function getPointerPos(e) {
+            if (e.touches && e.touches.length > 0) {
+                return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            }
+            if (e.changedTouches && e.changedTouches.length > 0) {
+                return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+            }
+            return { x: e.clientX, y: e.clientY };
+        }
+
+        function onDragStart(e) {
+            if (isGameOver) return;
+            if (dragState.active) return; // Уже тащим
+            
+            const pieceEl = e.target.closest('.piece');
+            if (!pieceEl) return;
+            
+            const index = parseInt(pieceEl.dataset.pieceIndex);
+            if (!pieces[index] || pieces[index].used) return;
+            
+            e.preventDefault();
+            e.stopPropagation();
             
             initAudio();
             
-            const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
-            const clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
-            if (!clientX || !clientY) return;
+            const pos = getPointerPos(e);
+            const piece = pieces[index];
             
-            isDragging = true;
-            draggedPiece = pieces[pieceIndex];
-            dragSlotIndex = pieceIndex;
+            // Создаём drag-элемент
+            const dragEl = createPieceElement(piece, index);
+            dragEl.classList.add('dragging');
+            document.body.appendChild(dragEl);
             
-            // Создаём копию для перетаскивания
-            dragElement = createPieceElement(draggedPiece, pieceIndex);
-            dragElement.classList.add('dragging');
-            document.body.appendChild(dragElement);
+            const rect = dragEl.getBoundingClientRect();
             
-            const rect = dragElement.getBoundingClientRect();
-            const offsetX = rect.width / 2;
-            const offsetY = rect.height / 2;
+            dragState = {
+                active: true,
+                pieceIndex: index,
+                element: dragEl,
+                piece: piece,
+                offsetX: rect.width / 2,
+                offsetY: rect.height / 2,
+                startX: pos.x,
+                startY: pos.y,
+                isTouch: !!e.touches
+            };
             
-            dragElement.style.left = (clientX - offsetX) + 'px';
-            dragElement.style.top = (clientY - offsetY) + 'px';
+            dragEl.style.left = (pos.x - dragState.offsetX) + 'px';
+            dragEl.style.top = (pos.y - dragState.offsetY) + 'px';
             
             // Скрываем оригинал
-            const slot = document.getElementById('slot' + pieceIndex);
+            const slot = document.getElementById('slot' + index);
             slot.innerHTML = '';
             slot.classList.remove('active');
             slot.classList.add('empty');
@@ -1334,62 +1235,56 @@
             vibrate(10);
         }
 
-        function moveDrag(e) {
-            if (!isDragging || !dragElement || !draggedPiece) return;
+        function onDragMove(e) {
+            if (!dragState.active || !dragState.element) return;
             
             e.preventDefault();
             e.stopPropagation();
             
-            const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
-            const clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
-            if (!clientX || !clientY) return;
+            const pos = getPointerPos(e);
             
-            const rect = dragElement.getBoundingClientRect();
-            const offsetX = rect.width / 2;
-            const offsetY = rect.height / 2;
-            
-            dragElement.style.left = (clientX - offsetX) + 'px';
-            dragElement.style.top = (clientY - offsetY) + 'px';
+            dragState.element.style.left = (pos.x - dragState.offsetX) + 'px';
+            dragState.element.style.top = (pos.y - dragState.offsetY) + 'px';
             
             // Показываем превью
-            const cell = getBoardCellFromPoint(clientX, clientY);
+            const cell = getBoardCellFromPoint(pos.x, pos.y);
             if (cell) {
-                const pieceH = draggedPiece.shape.length;
-                const pieceW = draggedPiece.shape[0].length;
+                const pieceH = dragState.piece.shape.length;
+                const pieceW = dragState.piece.shape[0].length;
                 const startRow = cell.row - Math.floor(pieceH / 2);
                 const startCol = cell.col - Math.floor(pieceW / 2);
-                showPreview(draggedPiece, startRow, startCol);
+                showPreview(dragState.piece, startRow, startCol);
             } else {
                 clearPreview();
             }
         }
 
-        function endDrag(e) {
-            if (!isDragging || !dragElement) return;
+        function onDragEnd(e) {
+            if (!dragState.active || !dragState.element) return;
             
-            const clientX = e.clientX !== undefined ? e.clientX : (e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientX : 0);
-            const clientY = e.clientY !== undefined ? e.clientY : (e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientY : 0);
+            e.preventDefault();
+            e.stopPropagation();
             
+            const pos = getPointerPos(e);
             let placed = false;
             
-            if (clientX && clientY) {
-                const cell = getBoardCellFromPoint(clientX, clientY);
+            if (pos.x && pos.y) {
+                const cell = getBoardCellFromPoint(pos.x, pos.y);
                 if (cell) {
-                    const pieceH = draggedPiece.shape.length;
-                    const pieceW = draggedPiece.shape[0].length;
+                    const pieceH = dragState.piece.shape.length;
+                    const pieceW = dragState.piece.shape[0].length;
                     const startRow = cell.row - Math.floor(pieceH / 2);
                     const startCol = cell.col - Math.floor(pieceW / 2);
                     
-                    if (canPlacePiece(draggedPiece, startRow, startCol)) {
-                        placePiece(draggedPiece, startRow, startCol);
-                        pieces[dragSlotIndex].used = true;
+                    if (canPlacePiece(dragState.piece, startRow, startCol)) {
+                        placePiece(dragState.piece, startRow, startCol);
+                        pieces[dragState.pieceIndex].used = true;
                         placed = true;
                         
                         playSound('place');
                         vibrate(20);
                         renderBoard();
                         
-                        // Проверяем линии
                         setTimeout(() => {
                             const lines = checkLines();
                             if (lines.length > 0) {
@@ -1423,9 +1318,7 @@
                             if (allUsed) {
                                 setTimeout(() => {
                                     generatePieces();
-                                    if (checkGameOver()) {
-                                        triggerGameOver();
-                                    }
+                                    if (checkGameOver()) triggerGameOver();
                                 }, lines.length > 0 ? 700 : 0);
                             } else if (checkGameOver()) {
                                 setTimeout(triggerGameOver, lines.length > 0 ? 700 : 0);
@@ -1435,11 +1328,19 @@
                 }
             }
             
-            dragElement.remove();
-            dragElement = null;
-            draggedPiece = null;
-            dragSlotIndex = -1;
-            isDragging = false;
+            // Очищаем drag
+            if (dragState.element) dragState.element.remove();
+            dragState = {
+                active: false,
+                pieceIndex: -1,
+                element: null,
+                piece: null,
+                offsetX: 0,
+                offsetY: 0,
+                startX: 0,
+                startY: 0,
+                isTouch: false
+            };
             clearPreview();
             
             if (!placed) {
@@ -1449,7 +1350,7 @@
             }
         }
 
-        // ==================== ОБРАБОТЧИКИ СОБЫТИЙ (ИСПРАВЛЕННЫЕ) ====================
+        // ==================== ОБРАБОТЧИКИ ====================
         function setupEventListeners() {
             // Кнопки меню
             document.getElementById('btnPlay').addEventListener('click', () => {
@@ -1469,7 +1370,7 @@
                 showScreen('menu');
             });
             
-            // Тогглы настроек
+            // Тогглы
             document.getElementById('toggleSound').addEventListener('click', function() {
                 soundEnabled = !soundEnabled;
                 this.classList.toggle('active', soundEnabled);
@@ -1491,75 +1392,23 @@
                 showScreen('menu');
             });
             
-            // === Drag & Drop — мышь (только на слотах, не глобально) ===
+            // === DRAG & DROP: Вешаем НА КАЖДЫЙ СЛОТ отдельно (чтобы точно ловить события) ===
             const piecesContainer = document.getElementById('piecesContainer');
             
-            piecesContainer.addEventListener('mousedown', (e) => {
-                if (currentScreen !== 'game') return;
-                const pieceEl = e.target.closest('.piece');
-                if (pieceEl && !isDragging) {
-                    e.preventDefault();
-                    const index = parseInt(pieceEl.dataset.pieceIndex);
-                    startDrag(e, index);
-                }
-            });
+            // Мышь
+            piecesContainer.addEventListener('mousedown', onDragStart);
+            window.addEventListener('mousemove', onDragMove);
+            window.addEventListener('mouseup', onDragEnd);
             
-            // Глобальные обработчики для move/up
-            window.addEventListener('mousemove', (e) => {
-                if (isDragging) {
-                    e.preventDefault();
-                    moveDrag(e);
-                }
-            });
+            // Тач — с passive: false чтобы preventDefault работал
+            piecesContainer.addEventListener('touchstart', onDragStart, { passive: false });
+            window.addEventListener('touchmove', onDragMove, { passive: false });
+            window.addEventListener('touchend', onDragEnd, { passive: false });
+            window.addEventListener('touchcancel', onDragEnd, { passive: false });
             
-            window.addEventListener('mouseup', (e) => {
-                if (isDragging) {
-                    e.preventDefault();
-                    endDrag(e);
-                }
-            });
-            
-            // === Drag & Drop — тач (только на слотах) ===
-            piecesContainer.addEventListener('touchstart', (e) => {
-                if (currentScreen !== 'game') return;
-                const pieceEl = e.target.closest('.piece');
-                if (pieceEl && !isDragging) {
-                    e.preventDefault();
-                    const index = parseInt(pieceEl.dataset.pieceIndex);
-                    startDrag(e, index);
-                }
-            }, { passive: false });
-            
-            window.addEventListener('touchmove', (e) => {
-                if (isDragging) {
-                    e.preventDefault();
-                    moveDrag(e);
-                }
-            }, { passive: false });
-            
-            window.addEventListener('touchend', (e) => {
-                if (isDragging) {
-                    e.preventDefault();
-                    endDrag(e);
-                }
-            }, { passive: false });
-            
-            window.addEventListener('touchcancel', (e) => {
-                if (isDragging) {
-                    e.preventDefault();
-                    endDrag(e);
-                }
-            }, { passive: false });
-            
-            // Предотвращаем контекстное меню
+            // Отключаем стандартное поведение
             document.addEventListener('contextmenu', e => e.preventDefault());
-            
-            // Предотвращаем стандартное поведение тача
-            document.addEventListener('touchstart', (e) => {
-                if (e.target.closest('.piece')) {
-                    e.preventDefault();
-                }
-            }, { passive: false });
+            document.addEventListener('dragstart', e => e.preventDefault());
         }
 
         // ==================== СТАРТ ====================
