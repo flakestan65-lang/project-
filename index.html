@@ -13,7 +13,8 @@
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
-            touch-action: manipulation;
+            -webkit-user-select: none;
+            touch-action: none;
         }
 
         :root {
@@ -42,6 +43,7 @@
             color: var(--text);
             overflow: hidden;
             position: relative;
+            touch-action: none;
         }
 
         /* ===== МЕНЮ ===== */
@@ -863,57 +865,31 @@
         // ==================== ИГРОВЫЕ ДАННЫЕ ====================
         const BOARD_SIZE = 8;
         const PIECES_COUNT = 3;
-        const CELL_SIZE_PX = 44; // базовый размер ячейки
         
-        // Все возможные фигуры (как в оригинале)
         const PIECE_DEFINITIONS = [
-            // Мономино (1 блок)
             { shape: [[1]], color: 0, weight: 8 },
-            // Домино (2 блока горизонтально)
             { shape: [[1,1]], color: 1, weight: 8 },
-            // Домино (2 блока вертикально)
             { shape: [[1],[1]], color: 2, weight: 8 },
-            // Тромино I (3 горизонтально)
             { shape: [[1,1,1]], color: 3, weight: 7 },
-            // Тромино I (3 вертикально)
             { shape: [[1],[1],[1]], color: 4, weight: 7 },
-            // Тромино L
             { shape: [[1,0],[1,1]], color: 5, weight: 6 },
-            // Тромино L зеркальный
             { shape: [[0,1],[1,1]], color: 6, weight: 6 },
-            // Тетрамино I (4 горизонтально)
             { shape: [[1,1,1,1]], color: 0, weight: 5 },
-            // Тетрамино I (4 вертикально)
             { shape: [[1],[1],[1],[1]], color: 1, weight: 5 },
-            // Тетрамино O (2x2)
             { shape: [[1,1],[1,1]], color: 2, weight: 6 },
-            // Тетрамино T
             { shape: [[1,1,1],[0,1,0]], color: 3, weight: 5 },
-            // Тетрамино T перевернутый
             { shape: [[0,1,0],[1,1,1]], color: 4, weight: 5 },
-            // Тетрамино L
             { shape: [[1,0,0],[1,1,1]], color: 5, weight: 5 },
-            // Тетрамино J
             { shape: [[0,0,1],[1,1,1]], color: 6, weight: 5 },
-            // Тетрамино S
             { shape: [[0,1,1],[1,1,0]], color: 7, weight: 5 },
-            // Тетрамино Z
             { shape: [[1,1,0],[0,1,1]], color: 0, weight: 5 },
-            // Пентамино (5 горизонтально)
             { shape: [[1,1,1,1,1]], color: 1, weight: 3 },
-            // Пентамино (5 вертикально)
             { shape: [[1],[1],[1],[1],[1]], color: 2, weight: 3 },
-            // Крест (5 блоков)
             { shape: [[0,1,0],[1,1,1],[0,1,0]], color: 3, weight: 3 },
-            // Прямоугольник 2x3
             { shape: [[1,1,1],[1,1,1]], color: 4, weight: 4 },
-            // Прямоугольник 3x2
             { shape: [[1,1],[1,1],[1,1]], color: 5, weight: 4 },
-            // Большой L (3x3 с углом)
             { shape: [[1,0,0],[1,0,0],[1,1,1]], color: 6, weight: 3 },
-            // Большой L зеркальный
             { shape: [[0,0,1],[0,0,1],[1,1,1]], color: 7, weight: 3 },
-            // Зигзаг 3x3
             { shape: [[1,1,0],[0,1,1],[0,0,1]], color: 0, weight: 3 },
         ];
 
@@ -926,7 +902,7 @@
         let dragSlotIndex = -1;
         let isGameOver = false;
         let isDragging = false;
-        let dragStartPos = { x: 0, y: 0 };
+        let dragPointerId = null;
         let currentScreen = 'menu';
 
         // ==================== УТИЛИТЫ ====================
@@ -942,17 +918,17 @@
 
         function generateUniquePieces() {
             const result = [];
-            const usedIndices = new Set();
+            const usedShapes = new Set();
             
             for (let i = 0; i < PIECES_COUNT; i++) {
-                let attempts = 0;
                 let piece;
+                let attempts = 0;
                 do {
                     piece = weightedRandom();
                     attempts++;
-                } while (usedIndices.has(piece.shape.toString()) && attempts < 20);
+                } while (usedShapes.has(JSON.stringify(piece.shape)) && attempts < 30);
                 
-                usedIndices.add(piece.shape.toString());
+                usedShapes.add(JSON.stringify(piece.shape));
                 result.push({
                     shape: piece.shape.map(row => [...row]),
                     color: piece.color,
@@ -1059,7 +1035,6 @@
             el.className = 'piece';
             el.dataset.pieceIndex = index;
             
-            // Адаптивный размер ячеек фигуры
             const cellSize = window.innerWidth < 420 ? 20 : 24;
             el.style.gridTemplateColumns = `repeat(${cols}, ${cellSize}px)`;
             el.style.gridTemplateRows = `repeat(${rows}, ${cellSize}px)`;
@@ -1305,7 +1280,7 @@
             }, 800);
         }
 
-        // ==================== DRAG AND DROP (ИСПРАВЛЕННЫЙ) ====================
+        // ==================== DRAG AND DROP (ПОЛНОСТЬЮ ПЕРЕПИСАННЫЙ) ====================
         function getBoardCellFromPoint(clientX, clientY) {
             const boardEl = document.getElementById('board');
             const rect = boardEl.getBoundingClientRect();
@@ -1323,24 +1298,19 @@
                      col: Math.max(0, Math.min(col, BOARD_SIZE - 1)) };
         }
 
-        function getPieceTopLeft(piece, boardRow, boardCol) {
-            // Возвращаем координаты верхнего левого угла фигуры на доске
-            return { row: boardRow, col: boardCol };
-        }
-
         function startDrag(e, pieceIndex) {
             if (isGameOver || !pieces[pieceIndex] || pieces[pieceIndex].used) return;
+            if (isDragging) return; // Уже тащим что-то
             
             initAudio();
             
-            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+            const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+            const clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
             if (!clientX || !clientY) return;
             
             isDragging = true;
             draggedPiece = pieces[pieceIndex];
             dragSlotIndex = pieceIndex;
-            dragStartPos = { x: clientX, y: clientY };
             
             // Создаём копию для перетаскивания
             dragElement = createPieceElement(draggedPiece, pieceIndex);
@@ -1368,8 +1338,10 @@
             if (!isDragging || !dragElement || !draggedPiece) return;
             
             e.preventDefault();
-            const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
-            const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+            e.stopPropagation();
+            
+            const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+            const clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
             if (!clientX || !clientY) return;
             
             const rect = dragElement.getBoundingClientRect();
@@ -1384,7 +1356,6 @@
             if (cell) {
                 const pieceH = draggedPiece.shape.length;
                 const pieceW = draggedPiece.shape[0].length;
-                // Привязываем к ближайшему углу фигуры
                 const startRow = cell.row - Math.floor(pieceH / 2);
                 const startCol = cell.col - Math.floor(pieceW / 2);
                 showPreview(draggedPiece, startRow, startCol);
@@ -1396,8 +1367,8 @@
         function endDrag(e) {
             if (!isDragging || !dragElement) return;
             
-            const clientX = e.clientX || (e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientX : 0);
-            const clientY = e.clientY || (e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientY : 0);
+            const clientX = e.clientX !== undefined ? e.clientX : (e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientX : 0);
+            const clientY = e.clientY !== undefined ? e.clientY : (e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientY : 0);
             
             let placed = false;
             
@@ -1427,7 +1398,6 @@
                                 score += points;
                                 updateScoreDisplay(true);
                                 
-                                // Показываем очки
                                 const boardRect = document.getElementById('board').getBoundingClientRect();
                                 showPointsText(points, 
                                     boardRect.left + boardRect.width / 2, 
@@ -1449,7 +1419,6 @@
                                 saveHighScore();
                             }
                             
-                            // Проверяем, все ли фигуры использованы
                             const allUsed = pieces.every(p => p.used);
                             if (allUsed) {
                                 setTimeout(() => {
@@ -1480,7 +1449,7 @@
             }
         }
 
-        // ==================== ОБРАБОТЧИКИ СОБЫТИЙ ====================
+        // ==================== ОБРАБОТЧИКИ СОБЫТИЙ (ИСПРАВЛЕННЫЕ) ====================
         function setupEventListeners() {
             // Кнопки меню
             document.getElementById('btnPlay').addEventListener('click', () => {
@@ -1522,44 +1491,75 @@
                 showScreen('menu');
             });
             
-            // Drag & Drop - мышь
-            document.addEventListener('mousedown', (e) => {
+            // === Drag & Drop — мышь (только на слотах, не глобально) ===
+            const piecesContainer = document.getElementById('piecesContainer');
+            
+            piecesContainer.addEventListener('mousedown', (e) => {
                 if (currentScreen !== 'game') return;
                 const pieceEl = e.target.closest('.piece');
                 if (pieceEl && !isDragging) {
+                    e.preventDefault();
                     const index = parseInt(pieceEl.dataset.pieceIndex);
                     startDrag(e, index);
                 }
             });
             
-            document.addEventListener('mousemove', (e) => {
-                if (isDragging) moveDrag(e);
+            // Глобальные обработчики для move/up
+            window.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    e.preventDefault();
+                    moveDrag(e);
+                }
             });
             
-            document.addEventListener('mouseup', (e) => {
-                if (isDragging) endDrag(e);
+            window.addEventListener('mouseup', (e) => {
+                if (isDragging) {
+                    e.preventDefault();
+                    endDrag(e);
+                }
             });
             
-            // Drag & Drop - тач
-            document.addEventListener('touchstart', (e) => {
+            // === Drag & Drop — тач (только на слотах) ===
+            piecesContainer.addEventListener('touchstart', (e) => {
                 if (currentScreen !== 'game') return;
                 const pieceEl = e.target.closest('.piece');
                 if (pieceEl && !isDragging) {
+                    e.preventDefault();
                     const index = parseInt(pieceEl.dataset.pieceIndex);
                     startDrag(e, index);
                 }
             }, { passive: false });
             
-            document.addEventListener('touchmove', (e) => {
-                if (isDragging) moveDrag(e);
+            window.addEventListener('touchmove', (e) => {
+                if (isDragging) {
+                    e.preventDefault();
+                    moveDrag(e);
+                }
             }, { passive: false });
             
-            document.addEventListener('touchend', (e) => {
-                if (isDragging) endDrag(e);
-            });
+            window.addEventListener('touchend', (e) => {
+                if (isDragging) {
+                    e.preventDefault();
+                    endDrag(e);
+                }
+            }, { passive: false });
+            
+            window.addEventListener('touchcancel', (e) => {
+                if (isDragging) {
+                    e.preventDefault();
+                    endDrag(e);
+                }
+            }, { passive: false });
             
             // Предотвращаем контекстное меню
             document.addEventListener('contextmenu', e => e.preventDefault());
+            
+            // Предотвращаем стандартное поведение тача
+            document.addEventListener('touchstart', (e) => {
+                if (e.target.closest('.piece')) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
         }
 
         // ==================== СТАРТ ====================
