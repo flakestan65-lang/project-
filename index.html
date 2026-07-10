@@ -669,7 +669,7 @@
 <script>
   // ── Конфигурация — вставьте сюда ваши данные ──
   const API_KEY = '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';   // ← вставьте ключ сюда
-  const MODEL   = 'google/gemma-3-27b-it:free';      // ← вставьте модель сюда
+  const MODEL   = 'meta-llama/llama-3.1-8b-instruct:free';      // ← вставьте модель сюда
 
   // ── State ──
   let currentScreen = 'home';
@@ -832,26 +832,27 @@
         body: JSON.stringify({
           model: MODEL,
           messages: [
-            { role: 'system', content: sysPrompt },
-            { role: 'user', content: finalText }
+            { role: 'user', content: sysPrompt + '\n\nЗапрос пользователя: ' + finalText }
           ],
           stream: false
         })
       });
 
-      const data = await res.json();
+      const rawText = await res.text();
+      let data;
+      try { data = JSON.parse(rawText); } catch { data = null; }
 
       typing.remove();
 
-      if (!res.ok) {
+      if (!res.ok || data?.error) {
         const code = data?.error?.code || res.status;
-        const msg  = data?.error?.message || 'Неизвестная ошибка';
-        const meta = data?.error?.metadata?.raw ? '\n\n' + data.error.metadata.raw : '';
-        throw new Error(`[${code}] ${msg}${meta}`);
+        const msg  = data?.error?.message || rawText || 'Неизвестная ошибка';
+        const meta = data?.error?.metadata?.raw || '';
+        throw new Error(`[${code}] ${msg}${meta ? '\n' + meta : ''}`);
       }
 
       const answer = data?.choices?.[0]?.message?.content;
-      if (!answer) throw new Error('Модель вернула пустой ответ. Проверьте название модели.');
+      if (!answer) throw new Error('Пустой ответ от модели. Полный ответ сервера:\n' + rawText);
 
       appendMsg(screen, 'ai', answer);
 
