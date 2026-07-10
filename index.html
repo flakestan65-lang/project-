@@ -1,1350 +1,951 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
-    <title>Block Blast</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-
-        body {
-            font-family: 'Nunito', sans-serif;
-            background: linear-gradient(180deg, #1a1a3e 0%, #16213e 50%, #0f3460 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: #fff;
-            overflow: hidden;
-            position: fixed;
-            width: 100%;
-            height: 100%;
-        }
-
-        .menu-screen {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: linear-gradient(180deg, #0d0d1a 0%, #1a1a3e 50%, #16213e 100%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 5000;
-            transition: opacity 0.5s ease, transform 0.5s ease;
-        }
-
-        .menu-screen.hidden {
-            opacity: 0;
-            pointer-events: none;
-            transform: scale(1.1);
-        }
-
-        .game-title {
-            font-size: 52px;
-            font-weight: 900;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, #e94560, #ff6b6b, #f9a826);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: 2px;
-        }
-
-        .game-subtitle {
-            font-size: 14px;
-            color: #a0a0c0;
-            margin-bottom: 40px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-        }
-
-        .menu-btn {
-            width: 260px;
-            padding: 16px 36px;
-            margin: 8px 0;
-            border: none;
-            border-radius: 14px;
-            font-size: 18px;
-            font-weight: 700;
-            font-family: 'Nunito', sans-serif;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .menu-btn-primary {
-            background: linear-gradient(135deg, #e94560, #ff6b6b);
-            color: #fff;
-            box-shadow: 0 8px 25px rgba(233, 69, 96, 0.4);
-        }
-
-        .menu-btn-primary:active {
-            transform: translateY(1px) scale(0.98);
-        }
-
-        .menu-btn-secondary {
-            background: rgba(255, 255, 255, 0.08);
-            color: #fff;
-            border: 2px solid rgba(255, 255, 255, 0.15);
-        }
-
-        .menu-btn-secondary:active {
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        .menu-stats {
-            margin-top: 30px;
-            text-align: center;
-        }
-
-        .menu-stats-label {
-            font-size: 12px;
-            color: #a0a0c0;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 6px;
-        }
-
-        .menu-stats-value {
-            font-size: 32px;
-            font-weight: 800;
-            color: #f9a826;
-            text-shadow: 0 0 15px rgba(249, 168, 38, 0.3);
-        }
-
-        .game-screen {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            max-width: 460px;
-            padding: 8px;
-            height: 100%;
-            justify-content: space-between;
-        }
-
-        .game-screen.active {
-            display: flex;
-        }
-
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            padding: 8px 5px;
-        }
-
-        .back-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff;
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-        }
-
-        .score-display {
-            text-align: center;
-        }
-
-        .score-label {
-            font-size: 11px;
-            color: #a0a0c0;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .score-value {
-            font-size: 28px;
-            font-weight: 800;
-            color: #fff;
-        }
-
-        .score-value.pop {
-            animation: scorePop 0.3s ease;
-        }
-
-        @keyframes scorePop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.3); color: #f9a826; }
-            100% { transform: scale(1); }
-        }
-
-        .highscore-display {
-            text-align: center;
-        }
-
-        .highscore-label {
-            font-size: 9px;
-            color: #a0a0c0;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .highscore-value {
-            font-size: 16px;
-            font-weight: 700;
-            color: #f9a826;
-        }
-
-        .board-wrapper {
-            position: relative;
-            padding: 8px;
-            background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-        }
-
-        .board {
-            display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            grid-template-rows: repeat(8, 1fr);
-            gap: 2px;
-        }
-
-        .cell {
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: 5px;
-            transition: transform 0.1s ease, opacity 0.1s ease;
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            aspect-ratio: 1;
-        }
-
-        .cell.filled {
-            border: none;
-            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.25), 0 2px 6px rgba(0, 0, 0, 0.3);
-        }
-
-        .cell.preview-invalid {
-            opacity: 0.35;
-            transform: scale(0.88);
-            border: 2px dashed rgba(255, 255, 255, 0.25) !important;
-        }
-
-        .cell.preview-valid {
-            opacity: 0.75;
-            transform: scale(0.93);
-            border: 2px solid rgba(255, 255, 255, 0.6) !important;
-        }
-
-        .cell.clearing {
-            animation: cellClear 0.45s ease forwards;
-        }
-
-        @keyframes cellClear {
-            0% { transform: scale(1); opacity: 1; }
-            30% { transform: scale(1.15); opacity: 0.9; }
-            100% { transform: scale(0); opacity: 0; }
-        }
-
-        .pieces-panel {
-            width: 100%;
-            padding: 10px 6px;
-            background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .pieces-container {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            min-height: 95px;
-        }
-
-        .piece-slot {
-            width: 95px;
-            height: 95px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 14px;
-            border: 2px dashed rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-            flex-shrink: 0;
-        }
-
-        .piece-slot.active {
-            border-color: rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .piece-slot.empty {
-            opacity: 0.3;
-        }
-
-        .piece {
-            display: inline-grid;
-            cursor: grab;
-            touch-action: none;
-            filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
-            /* gap задаётся inline */
-        }
-
-        .piece.dragging {
-            position: fixed;
-            z-index: 10000;
-            pointer-events: none;
-            cursor: grabbing;
-            filter: drop-shadow(0 12px 25px rgba(0, 0, 0, 0.6));
-        }
-
-        .piece-cell {
-            border-radius: 5px;
-            box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.35), 0 1px 2px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Цвета блоков */
-        .color-0 { background: linear-gradient(135deg, #e94560, #ff6b6b); }
-        .color-1 { background: linear-gradient(135deg, #f9a826, #ffd93d); }
-        .color-2 { background: linear-gradient(135deg, #16c79a, #06d6a0); }
-        .color-3 { background: linear-gradient(135deg, #118ab2, #06b6d4); }
-        .color-4 { background: linear-gradient(135deg, #9b5de5, #c77dff); }
-        .color-5 { background: linear-gradient(135deg, #ef476f, #ff8fa3); }
-        .color-6 { background: linear-gradient(135deg, #00bbf9, #48cae4); }
-        .color-7 { background: linear-gradient(135deg, #ff6b35, #ff9f43); }
-
-        /* Экран проигрыша — используем visibility + opacity вместо display */
-        .gameover-screen {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(10px);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 4000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
-        }
-
-        .gameover-screen.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .gameover-icon {
-            font-size: 70px;
-            margin-bottom: 15px;
-            animation: iconBounce 1s ease infinite alternate;
-        }
-
-        @keyframes iconBounce {
-            from { transform: translateY(0) rotate(-3deg); }
-            to { transform: translateY(-12px) rotate(3deg); }
-        }
-
-        .gameover-title {
-            font-size: 36px;
-            font-weight: 900;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, #e94560, #ff6b6b);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .gameover-subtitle {
-            font-size: 14px;
-            color: #a0a0c0;
-            margin-bottom: 25px;
-        }
-
-        .gameover-score-box {
-            background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
-            border-radius: 16px;
-            padding: 20px 40px;
-            margin-bottom: 8px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .gameover-score-label {
-            font-size: 12px;
-            color: #a0a0c0;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 6px;
-        }
-
-        .gameover-score-value {
-            font-size: 42px;
-            font-weight: 900;
-            color: #fff;
-        }
-
-        .gameover-best {
-            font-size: 14px;
-            color: #f9a826;
-            margin-bottom: 25px;
-            font-weight: 600;
-        }
-
-        .gameover-btn {
-            width: 240px;
-            padding: 14px;
-            margin: 6px 0;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 700;
-            font-family: 'Nunito', sans-serif;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .gameover-btn-primary {
-            background: linear-gradient(135deg, #e94560, #ff6b6b);
-            color: #fff;
-            box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4);
-        }
-
-        .gameover-btn-secondary {
-            background: rgba(255, 255, 255, 0.08);
-            color: #fff;
-            border: 2px solid rgba(255, 255, 255, 0.15);
-        }
-
-        .combo-text {
-            position: fixed;
-            font-size: 28px;
-            font-weight: 900;
-            color: #f9a826;
-            text-shadow: 0 0 20px rgba(249, 168, 38, 0.5);
-            pointer-events: none;
-            z-index: 9000;
-            animation: comboAnim 1s ease forwards;
-            white-space: nowrap;
-            transform: translateX(-50%);
-        }
-
-        @keyframes comboAnim {
-            0% { transform: translateX(-50%) translateY(0) scale(0.3); opacity: 0; }
-            15% { transform: translateX(-50%) translateY(-25px) scale(1.3); opacity: 1; }
-            100% { transform: translateX(-50%) translateY(-80px) scale(0.8); opacity: 0; }
-        }
-
-        .points-text {
-            position: fixed;
-            font-size: 22px;
-            font-weight: 800;
-            color: #fff;
-            pointer-events: none;
-            z-index: 9000;
-            animation: pointsAnim 0.8s ease forwards;
-            transform: translateX(-50%);
-        }
-
-        @keyframes pointsAnim {
-            0% { transform: translateX(-50%) translateY(0); opacity: 1; }
-            100% { transform: translateX(-50%) translateY(-50px); opacity: 0; }
-        }
-
-        .particles-container {
-            position: fixed;
-            pointer-events: none;
-            z-index: 8500;
-        }
-
-        .particle {
-            position: absolute;
-            border-radius: 50%;
-            animation: particleBurst 0.7s ease forwards;
-        }
-
-        @keyframes particleBurst {
-            0% { transform: translate(0, 0) scale(1); opacity: 1; }
-            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
-        }
-
-        .settings-screen {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(15px);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 6000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-
-        .settings-screen.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .settings-title {
-            font-size: 28px;
-            font-weight: 800;
-            margin-bottom: 25px;
-        }
-
-        .setting-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 280px;
-            padding: 12px 18px;
-            margin: 6px 0;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .setting-label {
-            font-size: 15px;
-            font-weight: 600;
-        }
-
-        .toggle {
-            width: 46px;
-            height: 24px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            position: relative;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-
-        .toggle.active { background: #16c79a; }
-
-        .toggle-knob {
-            width: 20px;
-            height: 20px;
-            background: #fff;
-            border-radius: 50%;
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            transition: left 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .toggle.active .toggle-knob { left: 24px; }
-
-        @media (max-height: 700px) {
-            .game-title { font-size: 36px; }
-            .top-bar { padding: 4px 5px; }
-            .pieces-panel { padding: 6px; }
-            .piece-slot { width: 80px; height: 80px; }
-        }
-
-        @media (max-width: 380px) {
-            .piece-slot { width: 82px; height: 82px; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jarvis — ИИ Ассистент</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0f1a;
+    --surface: #13162a;
+    --card: #181c2e;
+    --card-hover: #1e2338;
+    --border: rgba(255,255,255,0.07);
+    --text: #e8eaf6;
+    --muted: #7b7fa0;
+    --accent-blue: #6c8cf5;
+    --accent-purple: #a56bfa;
+    --accent-cyan: #4fd1c5;
+    --accent-green: #68d391;
+    --accent-yellow: #f6e05e;
+    --accent-pink: #f687b3;
+    --accent-orange: #f6ad55;
+    --gradient: linear-gradient(135deg, #6c8cf5, #a56bfa);
+    --ring: conic-gradient(from 0deg, #6c8cf5, #a56bfa, #4fd1c5, #6c8cf5);
+    --radius: 14px;
+    --radius-sm: 10px;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  /* ─── Layout ─── */
+  .app { display: flex; height: 100vh; overflow: hidden; }
+
+  /* ─── Sidebar ─── */
+  .sidebar {
+    width: 260px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+    flex-shrink: 0;
+    transition: transform .3s;
+  }
+  .sidebar-logo {
+    padding: 0 20px 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+  .sidebar-logo span {
+    font-size: 22px;
+    font-weight: 700;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.5px;
+  }
+  .sidebar-logo small { display: block; color: var(--muted); font-size: 11px; margin-top: 2px; }
+
+  .sidebar-nav { flex: 1; overflow-y: auto; padding: 8px 10px; }
+  .nav-label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; padding: 12px 10px 4px; }
+
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: var(--radius-sm);
+    cursor: pointer; color: var(--muted);
+    font-size: 14px; font-weight: 500;
+    transition: background .15s, color .15s;
+    margin-bottom: 2px;
+  }
+  .nav-item svg { flex-shrink: 0; opacity: .7; }
+  .nav-item:hover { background: var(--card); color: var(--text); }
+  .nav-item:hover svg { opacity: 1; }
+  .nav-item.active { background: var(--card); color: var(--text); }
+  .nav-item.active svg { opacity: 1; }
+  .nav-item .nav-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+  .sidebar-footer { padding: 16px; border-top: 1px solid var(--border); }
+
+  /* ─── Main ─── */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* ─── Header ─── */
+  .topbar {
+    height: 58px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px; flex-shrink: 0;
+    background: var(--surface);
+  }
+  .topbar-title { font-weight: 600; font-size: 16px; }
+  .topbar-actions { display: flex; gap: 8px; }
+  .topbar-btn {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--muted); padding: 7px 14px;
+    font-size: 13px; cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; gap: 6px;
+    transition: background .15s, color .15s;
+  }
+  .topbar-btn:hover { background: var(--card-hover); color: var(--text); }
+  .hamburger { display: none; background: none; border: none; color: var(--muted); cursor: pointer; padding: 6px; }
+
+  /* ─── Home screen ─── */
+  #screen-home {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    overflow-y: auto; padding: 40px 24px;
+  }
+  .hero-ring {
+    width: 100px; height: 100px; border-radius: 50%;
+    position: relative; margin-bottom: 24px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hero-ring::before {
+    content: '';
+    position: absolute; inset: 0; border-radius: 50%;
+    background: conic-gradient(from 0deg, #6c8cf5, #a56bfa, #4fd1c5, #6c8cf5);
+    animation: spin 4s linear infinite;
+    mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px));
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px));
+  }
+  .hero-ring-inner {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: radial-gradient(circle at 40% 40%, rgba(108,140,245,.18), transparent 70%);
+    border: 1px solid rgba(108,140,245,.2);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hero-ring-pulse {
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--gradient);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: .8; }
+    50% { transform: scale(1.3); opacity: 1; }
+  }
+
+  .hero-title { font-size: 28px; font-weight: 700; margin-bottom: 6px; }
+  .hero-subtitle { color: var(--muted); font-size: 15px; margin-bottom: 36px; }
+
+  .feature-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 12px; width: 100%; max-width: 620px; margin-bottom: 32px;
+  }
+  .feature-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 18px 14px;
+    cursor: pointer; transition: background .15s, border-color .2s, transform .15s;
+    display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center;
+  }
+  .feature-card:hover { background: var(--card-hover); border-color: rgba(108,140,245,.3); transform: translateY(-2px); }
+  .feature-card .icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+  .feature-card .label { font-size: 13px; font-weight: 600; }
+  .feature-card .desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+  /* ─── Chat ─── */
+  #screen-chat, #screen-write, #screen-ideas, #screen-code, #screen-files, #screen-translate {
+    flex: 1; display: none; flex-direction: column; overflow: hidden;
+  }
+  .chat-messages {
+    flex: 1; overflow-y: auto; padding: 24px;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .msg { display: flex; gap: 12px; max-width: 760px; }
+  .msg.user { flex-direction: row-reverse; align-self: flex-end; }
+  .msg-avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-size: 14px; font-weight: 700;
+  }
+  .msg.ai .msg-avatar { background: var(--gradient); }
+  .msg.user .msg-avatar { background: var(--card); border: 1px solid var(--border); color: var(--muted); }
+  .msg-bubble {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 12px 16px;
+    font-size: 14px; line-height: 1.6; max-width: 600px;
+  }
+  .msg.user .msg-bubble { background: rgba(108,140,245,.12); border-color: rgba(108,140,245,.2); }
+  .msg-bubble code {
+    background: rgba(0,0,0,.3); border-radius: 4px;
+    padding: 2px 6px; font-size: 13px; font-family: 'Fira Code', monospace;
+  }
+  .msg-bubble pre {
+    background: rgba(0,0,0,.4); border-radius: 8px;
+    padding: 14px; margin: 8px 0; overflow-x: auto;
+    font-size: 13px; font-family: 'Fira Code', monospace;
+    border: 1px solid var(--border);
+  }
+
+  .typing-indicator { display: flex; gap: 4px; align-items: center; padding: 4px 0; }
+  .typing-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--accent-blue); opacity: .6;
+    animation: bounce .9s ease-in-out infinite;
+  }
+  .typing-dot:nth-child(2) { animation-delay: .15s; }
+  .typing-dot:nth-child(3) { animation-delay: .3s; }
+  @keyframes bounce {
+    0%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-6px); }
+  }
+
+  /* ─── Bottom input ─── */
+  .chat-input-area {
+    padding: 16px 24px 20px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .chat-input-row {
+    display: flex; gap: 10px; align-items: flex-end;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 10px 14px;
+    transition: border-color .2s;
+  }
+  .chat-input-row:focus-within { border-color: rgba(108,140,245,.4); }
+  .chat-input-row textarea {
+    flex: 1; background: none; border: none; outline: none;
+    color: var(--text); font-family: inherit; font-size: 14px;
+    resize: none; max-height: 140px; line-height: 1.5;
+  }
+  .chat-input-row textarea::placeholder { color: var(--muted); }
+  .send-btn {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--gradient); border: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0; transition: opacity .15s;
+  }
+  .send-btn:hover { opacity: .85; }
+
+
+
+  /* ─── All features screen ─── */
+  #screen-all { flex: 1; display: none; flex-direction: column; overflow-y: auto; }
+  .all-list { padding: 16px; }
+  .all-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 16px; border-radius: var(--radius);
+    cursor: pointer; transition: background .15s; margin-bottom: 6px;
+    border: 1px solid transparent;
+  }
+  .all-item:hover { background: var(--card); border-color: var(--border); }
+  .all-item .ai-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .all-item .ai-info { flex: 1; }
+  .all-item .ai-name { font-size: 15px; font-weight: 600; margin-bottom: 3px; }
+  .all-item .ai-desc { font-size: 12px; color: var(--muted); }
+  .all-item .arrow { color: var(--muted); opacity: .5; }
+
+  /* ─── File upload zone ─── */
+  .drop-zone {
+    border: 2px dashed var(--border); border-radius: var(--radius);
+    padding: 32px; text-align: center; cursor: pointer;
+    transition: border-color .2s, background .2s; margin: 0 24px 16px;
+  }
+  .drop-zone:hover, .drop-zone.drag-over {
+    border-color: var(--accent-blue); background: rgba(108,140,245,.05);
+  }
+  .drop-zone p { color: var(--muted); font-size: 13px; margin-top: 8px; }
+
+  /* ─── History ─── */
+  #screen-history { flex: 1; display: none; flex-direction: column; overflow-y: auto; padding: 20px; }
+  .history-empty { text-align: center; color: var(--muted); margin-top: 60px; font-size: 14px; }
+  .history-item {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px;
+    cursor: pointer; transition: background .15s;
+  }
+  .history-item:hover { background: var(--card-hover); }
+  .history-item .hi-date { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .history-item .hi-preview { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .history-item .hi-feature { font-size: 11px; color: var(--accent-blue); margin-top: 4px; }
+
+  /* ─── Scrollbar ─── */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 10px; }
+
+  /* ─── Toast ─── */
+  .toast {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--card-hover); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 20px; font-size: 13px;
+    opacity: 0; transition: all .3s; pointer-events: none; z-index: 999;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ─── Mobile ─── */
+  @media (max-width: 640px) {
+    .sidebar { position: fixed; left: 0; top: 0; bottom: 0; z-index: 100; transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); box-shadow: 0 0 40px rgba(0,0,0,.5); }
+    .hamburger { display: flex; }
+    .feature-grid { grid-template-columns: repeat(2, 1fr); }
+    .chat-messages { padding: 16px; }
+    .chat-input-area { padding: 12px 16px 16px; }
+  }
+</style>
 </head>
 <body>
 
-    <!-- МЕНЮ -->
-    <div class="menu-screen" id="menuScreen">
-        <div class="game-title">BLOCK BLAST</div>
-        <div class="game-subtitle">Головоломка №1 в мире</div>
-        <button class="menu-btn menu-btn-primary" id="btnPlay">Играть</button>
-        <button class="menu-btn menu-btn-secondary" id="btnSettings">Настройки</button>
-        <div class="menu-stats">
-            <div class="menu-stats-label">Лучший результат</div>
-            <div class="menu-stats-value" id="menuHighScore">0</div>
-        </div>
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <span>Jarvis</span>
+      <small>ИИ Ассистент</small>
     </div>
-
-    <!-- НАСТРОЙКИ -->
-    <div class="settings-screen" id="settingsScreen">
-        <div class="settings-title">Настройки</div>
-        <div class="setting-row">
-            <span class="setting-label">Звук</span>
-            <div class="toggle active" id="toggleSound"><div class="toggle-knob"></div></div>
+    <nav class="sidebar-nav">
+      <div class="nav-label">Главное</div>
+      <div class="nav-item active" onclick="showScreen('home', this)">
+        <div class="nav-icon" style="background:rgba(108,140,245,.15)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6c8cf5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         </div>
-        <div class="setting-row">
-            <span class="setting-label">Вибрация</span>
-            <div class="toggle active" id="toggleVibro"><div class="toggle-knob"></div></div>
+        Главная
+      </div>
+      <div class="nav-label">Функции</div>
+      <div class="nav-item" onclick="showScreen('chat', this)">
+        <div class="nav-icon" style="background:rgba(165,107,250,.15)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a56bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         </div>
-        <button class="menu-btn menu-btn-secondary" id="btnBackSettings" style="margin-top:25px;width:180px;">Назад</button>
+        Чат с ИИ
+      </div>
+      <div class="nav-item" onclick="showScreen('write', this)">
+        <div class="nav-icon" style="background:rgba(79,209,197,.15)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4fd1c5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </div>
+        Написать текст
+      </div>
+      <div class="nav-item" onclick="showScreen('ideas', this)">
+        <div class="nav-icon" style="background:rgba(246,224,94,.15)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f6e05e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
+        </div>
+        Идеи
+      </div>
+      <div class="nav-item" onclick="showScreen('code', this)">
+        <div class="nav-icon" style="background:rgba(108,140,245,.15)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6c8cf5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
+        Код
+      </div>
+      <div class="nav-item" onclick="showScreen('files', this)">
+        <div class="nav-icon" style="background:rgba(246,173,85,.15)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f6ad55" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </div>
+        Анализ файлов
+      </div>
+      <div class="nav-item" onclick="showScreen('translate', this)">
+        <div class="nav-icon" style="background:rgba(79,209,197,.15)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4fd1c5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        </div>
+        Переводчик
+      </div>
+      <div class="nav-label">Прочее</div>
+      <div class="nav-item" onclick="showScreen('history', this)">
+        <div class="nav-icon" style="background:rgba(246,224,94,.15)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f6e05e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        История
+      </div>
+      <div class="nav-item" onclick="showScreen('all', this)">
+        <div class="nav-icon" style="background:rgba(246,135,179,.15)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f687b3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        </div>
+        Все функции
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div style="font-size:11px;color:var(--muted);text-align:center;">Jarvis AI v1.0</div>
     </div>
+  </aside>
 
-    <!-- ИГРОВОЙ ЭКРАН -->
-    <div class="game-screen" id="gameScreen">
-        <div class="top-bar">
-            <button class="back-btn" id="btnBack">←</button>
-            <div class="score-display">
-                <div class="score-label">Счёт</div>
-                <div class="score-value" id="scoreValue">0</div>
+  <!-- Main area -->
+  <div class="main">
+    <!-- Topbar -->
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="hamburger" onclick="toggleSidebar()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <span class="topbar-title" id="topbarTitle">Главная</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="topbar-btn" onclick="clearChat()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          Очистить
+        </button>
+      </div>
+    </header>
+
+    <!-- Screen: Home -->
+    <div id="screen-home" style="display:flex;flex-direction:column;">
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow-y:auto;padding:40px 24px;">
+        <div class="hero-ring">
+          <div class="hero-ring-inner">
+            <div class="hero-ring-pulse"></div>
+          </div>
+        </div>
+        <h1 class="hero-title">Привет! Я Jarvis</h1>
+        <p class="hero-subtitle">Чем могу помочь сегодня?</p>
+        <div class="feature-grid">
+          <div class="feature-card" onclick="showScreen('chat')">
+            <div class="icon" style="background:rgba(165,107,250,.15)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a56bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             </div>
-            <div class="highscore-display">
-                <div class="highscore-label">Рекорд</div>
-                <div class="highscore-value" id="highScoreValue">0</div>
+            <span class="label">Чат с ИИ</span>
+            <span class="desc">Задавайте вопросы и получайте ответы</span>
+          </div>
+          <div class="feature-card" onclick="showScreen('write')">
+            <div class="icon" style="background:rgba(79,209,197,.15)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4fd1c5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
             </div>
-        </div>
-
-        <div class="board-wrapper">
-            <div class="board" id="board"></div>
-        </div>
-
-        <div class="pieces-panel">
-            <div class="pieces-container" id="piecesContainer">
-                <div class="piece-slot" id="slot0"></div>
-                <div class="piece-slot" id="slot1"></div>
-                <div class="piece-slot" id="slot2"></div>
+            <span class="label">Написать текст</span>
+            <span class="desc">Создавайте тексты, письма и другое</span>
+          </div>
+          <div class="feature-card" onclick="showScreen('ideas')">
+            <div class="icon" style="background:rgba(246,224,94,.15)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f6e05e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
             </div>
+            <span class="label">Идеи</span>
+            <span class="desc">Находите идеи и вдохновение</span>
+          </div>
+          <div class="feature-card" onclick="showScreen('code')">
+            <div class="icon" style="background:rgba(108,140,245,.15)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6c8cf5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            </div>
+            <span class="label">Код</span>
+            <span class="desc">Помощь с кодом, объяснение и отладка</span>
+          </div>
+          <div class="feature-card" onclick="showScreen('files')">
+            <div class="icon" style="background:rgba(246,173,85,.15)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f6ad55" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>
+            </div>
+            <span class="label">Анализ файлов</span>
+            <span class="desc">Загружайте файлы и получайте анализ</span>
+          </div>
+          <div class="feature-card" onclick="showScreen('translate')">
+            <div class="icon" style="background:rgba(79,209,197,.15)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4fd1c5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <span class="label">Переводчик</span>
+            <span class="desc">Переводите тексты на любые языки</span>
+          </div>
         </div>
+      </div>
+      <!-- Input at bottom of home -->
+      <div class="chat-input-area">
+        <div class="chat-input-row">
+          <textarea id="homeInput" rows="1" placeholder="Напишите сообщение..." oninput="autoResize(this)" onkeydown="handleKey(event,'home')"></textarea>
+          <button class="send-btn" onclick="sendFromHome()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+      </div>
     </div>
 
-    <!-- ЭКРАН ПРОИГРЫША -->
-    <div class="gameover-screen" id="gameOverScreen">
-        <div class="gameover-icon">💥</div>
-        <div class="gameover-title">Игра окончена!</div>
-        <div class="gameover-subtitle">Больше нет ходов</div>
-        <div class="gameover-score-box">
-            <div class="gameover-score-label">Ваш счёт</div>
-            <div class="gameover-score-value" id="finalScore">0</div>
+    <!-- Screen: Chat -->
+    <div id="screen-chat">
+      <div class="chat-messages" id="chatMessages"></div>
+      <div class="chat-input-area">
+        <div class="chat-input-row">
+          <textarea id="chatInput" rows="1" placeholder="Напишите сообщение..." oninput="autoResize(this)" onkeydown="handleKey(event,'chat')"></textarea>
+          <button class="send-btn" onclick="sendMessage('chat')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
         </div>
-        <div class="gameover-best" id="finalBest">Лучший: 0</div>
-        <button class="gameover-btn gameover-btn-primary" id="btnRestart">Играть снова</button>
-        <button class="gameover-btn gameover-btn-secondary" id="btnMenu">В меню</button>
+      </div>
     </div>
 
-    <script>
-    // ==================== АУДИО ====================
-    let audioCtx = null;
-    let soundEnabled = true;
-    let vibroEnabled = true;
+    <!-- Screen: Write -->
+    <div id="screen-write">
+      <div class="chat-messages" id="writeMessages">
+        <div class="msg ai">
+          <div class="msg-avatar">J</div>
+          <div class="msg-bubble">Я помогу вам написать любой текст — статью, письмо, историю, описание товара, пост в соцсети или что-то ещё. Просто опишите, что нужно!</div>
+        </div>
+      </div>
+      <div class="chat-input-area">
+        <div class="chat-input-row">
+          <textarea id="writeInput" rows="1" placeholder="Например: напиши деловое письмо о переносе встречи..." oninput="autoResize(this)" onkeydown="handleKey(event,'write')"></textarea>
+          <button class="send-btn" onclick="sendMessage('write')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
 
-    function initAudio() {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    <!-- Screen: Ideas -->
+    <div id="screen-ideas">
+      <div class="chat-messages" id="ideasMessages">
+        <div class="msg ai">
+          <div class="msg-avatar">J</div>
+          <div class="msg-bubble">Давайте генерировать идеи! Расскажите о задаче или теме — я предложу множество креативных решений и вдохновляющих идей.</div>
+        </div>
+      </div>
+      <div class="chat-input-area">
+        <div class="chat-input-row">
+          <textarea id="ideasInput" rows="1" placeholder="Например: идеи для названия стартапа в сфере EdTech..." oninput="autoResize(this)" onkeydown="handleKey(event,'ideas')"></textarea>
+          <button class="send-btn" onclick="sendMessage('ideas')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Screen: Code -->
+    <div id="screen-code">
+      <div class="chat-messages" id="codeMessages">
+        <div class="msg ai">
+          <div class="msg-avatar">J</div>
+          <div class="msg-bubble">Помогу с кодом на любом языке программирования. Могу написать, объяснить, отладить или оптимизировать ваш код.</div>
+        </div>
+      </div>
+      <div class="chat-input-area">
+        <div class="chat-input-row">
+          <textarea id="codeInput" rows="1" placeholder="Например: напиши функцию сортировки на Python..." oninput="autoResize(this)" onkeydown="handleKey(event,'code')"></textarea>
+          <button class="send-btn" onclick="sendMessage('code')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Screen: Files -->
+    <div id="screen-files">
+      <div class="chat-messages" id="filesMessages" style="flex:1">
+        <div class="msg ai">
+          <div class="msg-avatar">J</div>
+          <div class="msg-bubble">Загрузите файл (TXT, PDF, CSV) — я проанализирую его и дам подробные выводы.</div>
+        </div>
+      </div>
+      <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6c8cf5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <p>Перетащите файл сюда или нажмите для выбора</p>
+        <input type="file" id="fileInput" style="display:none" accept=".txt,.csv,.pdf,.json,.md" onchange="handleFile(event)">
+      </div>
+      <div class="chat-input-area">
+        <div class="chat-input-row">
+          <textarea id="filesInput" rows="1" placeholder="Задайте вопрос о файле..." oninput="autoResize(this)" onkeydown="handleKey(event,'files')"></textarea>
+          <button class="send-btn" onclick="sendMessage('files')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Screen: Translate -->
+    <div id="screen-translate">
+      <div class="chat-messages" id="translateMessages">
+        <div class="msg ai">
+          <div class="msg-avatar">J</div>
+          <div class="msg-bubble">Переведу текст на любой язык. Просто напишите текст и укажите язык перевода, например: «Переведи на английский: Привет, как дела?»</div>
+        </div>
+      </div>
+      <div class="chat-input-area">
+        <div class="chat-input-row">
+          <textarea id="translateInput" rows="1" placeholder="Например: переведи на немецкий: Добрый день..." oninput="autoResize(this)" onkeydown="handleKey(event,'translate')"></textarea>
+          <button class="send-btn" onclick="sendMessage('translate')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Screen: All features -->
+    <div id="screen-all">
+      <div class="all-list">
+        <div class="all-item" onclick="showScreen('chat')">
+          <div class="ai-icon" style="background:rgba(165,107,250,.15)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a56bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div class="ai-info">
+            <div class="ai-name">Чат с ИИ</div>
+            <div class="ai-desc">Задавайте любые вопросы и получайте умные ответы</div>
+          </div>
+          <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="all-item" onclick="showScreen('write')">
+          <div class="ai-icon" style="background:rgba(79,209,197,.15)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4fd1c5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          </div>
+          <div class="ai-info">
+            <div class="ai-name">Написать текст</div>
+            <div class="ai-desc">Создавайте статьи, письма, истории и многое другое</div>
+          </div>
+          <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="all-item" onclick="showScreen('ideas')">
+          <div class="ai-icon" style="background:rgba(246,224,94,.15)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f6e05e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+          </div>
+          <div class="ai-info">
+            <div class="ai-name">Идеи</div>
+            <div class="ai-desc">Генерируйте идеи, находите решения и вдохновение</div>
+          </div>
+          <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="all-item" onclick="showScreen('code')">
+          <div class="ai-icon" style="background:rgba(108,140,245,.15)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6c8cf5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          </div>
+          <div class="ai-info">
+            <div class="ai-name">Код</div>
+            <div class="ai-desc">Помощь с написанием кода, объяснение и отладка</div>
+          </div>
+          <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="all-item" onclick="showScreen('files')">
+          <div class="ai-icon" style="background:rgba(246,173,85,.15)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f6ad55" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>
+          </div>
+          <div class="ai-info">
+            <div class="ai-name">Анализ файлов</div>
+            <div class="ai-desc">Загружайте документы и получайте анализ и выводы</div>
+          </div>
+          <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="all-item" onclick="showScreen('translate')">
+          <div class="ai-icon" style="background:rgba(79,209,197,.15)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4fd1c5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </div>
+          <div class="ai-info">
+            <div class="ai-name">Переводчик</div>
+            <div class="ai-desc">Переводите тексты на любые языки быстро и точно</div>
+          </div>
+          <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="all-item">
+          <div class="ai-icon" style="background:rgba(246,135,179,.15)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f687b3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          </div>
+          <div class="ai-info">
+            <div class="ai-name">Голосовой ввод</div>
+            <div class="ai-desc">Говорите, а Jarvis преобразует ваши слова в текст</div>
+          </div>
+          <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="all-item" onclick="showScreen('history')">
+          <div class="ai-icon" style="background:rgba(246,224,94,.15)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f6e05e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="ai-info">
+            <div class="ai-name">История</div>
+            <div class="ai-desc">Просматривайте ваши предыдущие запросы</div>
+          </div>
+          <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Screen: History -->
+    <div id="screen-history">
+      <div id="historyList" style="padding:16px"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── Конфигурация — вставьте сюда ваши данные ──
+  const API_KEY = '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';   // ← вставьте ключ сюда
+  const MODEL   = 'google/gemma-4-31b-it:free';      // ← вставьте модель сюда
+
+  // ── State ──
+  let currentScreen = 'home';
+  let isLoading = false;
+  let fileContent = '';
+  let history = JSON.parse(localStorage.getItem('jarvis_history') || '[]');
+
+  const screenTitles = {
+    home: 'Главная', chat: 'Чат с ИИ', write: 'Написать текст',
+    ideas: 'Идеи', code: 'Код', files: 'Анализ файлов',
+    translate: 'Переводчик', all: 'Все функции', history: 'История'
+  };
+
+  const systemPrompts = {
+    chat: 'Ты — Jarvis, умный ИИ-ассистент. Отвечай на русском языке, если пользователь пишет по-русски. Будь полезным, точным и дружелюбным.',
+    write: 'Ты — Jarvis, профессиональный писатель и копирайтер. Помогай создавать качественные тексты: статьи, письма, истории, описания. Пиши грамотно, структурированно и интересно. Отвечай на языке пользователя.',
+    ideas: 'Ты — Jarvis, креативный генератор идей. Предлагай множество разнообразных, оригинальных и практичных идей. Структурируй их по пунктам, объясняй каждую идею кратко. Отвечай на языке пользователя.',
+    code: 'Ты — Jarvis, опытный программист. Помогай с кодом на любых языках. Давай чистый, рабочий код с комментариями. Объясняй логику. Используй markdown для форматирования кода. Отвечай на языке пользователя.',
+    files: 'Ты — Jarvis, аналитик документов. Тебе предоставят содержимое файла. Анализируй его, выделяй ключевые моменты, отвечай на вопросы пользователя о нём. Давай структурированные выводы. Отвечай на языке пользователя.',
+    translate: 'Ты — Jarvis, профессиональный переводчик. Переводи тексты точно и естественно на указанный язык. Сохраняй стиль и тон оригинала. Если язык не указан, спроси пользователя.',
+  };
+
+  // ── Screens ──
+  function showScreen(name, navEl) {
+    document.querySelectorAll('[id^="screen-"]').forEach(s => s.style.display = 'none');
+    const el = document.getElementById('screen-' + name);
+    if (el) { el.style.display = 'flex'; el.style.flexDirection = 'column'; }
+    currentScreen = name;
+    document.getElementById('topbarTitle').textContent = screenTitles[name] || name;
+    if (navEl) {
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      navEl.classList.add('active');
+    }
+    if (name === 'history') renderHistory();
+    if (window.innerWidth < 640) document.getElementById('sidebar').classList.remove('open');
+  }
+
+  // ── Auto resize textarea ──
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 140) + 'px';
+  }
+
+  function handleKey(e, screen) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (screen === 'home') sendFromHome();
+      else sendMessage(screen);
+    }
+  }
+
+  // ── From home input ──
+  function sendFromHome() {
+    const val = document.getElementById('homeInput').value.trim();
+    if (!val) return;
+    document.getElementById('homeInput').value = '';
+    showScreen('chat', document.querySelector('.nav-item:nth-child(3)'));
+    appendMsg('chat', 'user', val);
+    callAI('chat', val, document.getElementById('chatMessages'));
+  }
+
+  // ── Send message ──
+  async function sendMessage(screen) {
+    const input = document.getElementById(screen + 'Input');
+    const text = input.value.trim();
+    if (!text || isLoading) return;
+    input.value = '';
+    input.style.height = 'auto';
+    const msgContainer = document.getElementById(screen + 'Messages');
+    appendMsg(screen, 'user', text);
+    scrollBottom(msgContainer);
+    await callAI(screen, text, msgContainer);
+  }
+
+  // ── Append message ──
+  function appendMsg(screen, role, text) {
+    const container = document.getElementById(screen + 'Messages');
+    const div = document.createElement('div');
+    div.className = 'msg ' + (role === 'user' ? 'user' : 'ai');
+    const avatar = document.createElement('div');
+    avatar.className = 'msg-avatar';
+    avatar.textContent = role === 'user' ? '👤' : 'J';
+    const bubble = document.createElement('div');
+    bubble.className = 'msg-bubble';
+    bubble.innerHTML = formatText(text);
+    div.appendChild(avatar);
+    div.appendChild(bubble);
+    container.appendChild(div);
+    scrollBottom(container);
+    return bubble;
+  }
+
+  function formatText(text) {
+    // Code blocks
+    text = text.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) =>
+      `<pre><code>${escapeHtml(code.trim())}</code></pre>`);
+    // Inline code
+    text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+    // Bold
+    text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    // Newlines
+    text = text.replace(/\n/g, '<br>');
+    return text;
+  }
+
+  function escapeHtml(t) {
+    return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function scrollBottom(el) {
+    setTimeout(() => { el.scrollTop = el.scrollHeight; }, 50);
+  }
+
+  // ── Typing indicator ──
+  function addTyping(container) {
+    const div = document.createElement('div');
+    div.className = 'msg ai';
+    div.id = 'typing-' + container.id;
+    const avatar = document.createElement('div');
+    avatar.className = 'msg-avatar';
+    avatar.textContent = 'J';
+    const bubble = document.createElement('div');
+    bubble.className = 'msg-bubble';
+    const ind = document.createElement('div');
+    ind.className = 'typing-indicator';
+    ind.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+    bubble.appendChild(ind);
+    div.appendChild(avatar);
+    div.appendChild(bubble);
+    container.appendChild(div);
+    scrollBottom(container);
+    return div;
+  }
+
+  // ── Call OpenRouter ──
+  async function callAI(screen, userText, container) {
+    if (!API_KEY || API_KEY === 'ВАШ_КЛЮЧ_OPENROUTER') {
+      appendMsg(screen, 'ai', '⚠️ Вставьте ваш OpenRouter API ключ в переменную API_KEY в коде сайта.');
+      return;
+    }
+
+    isLoading = true;
+    const typing = addTyping(container);
+
+    const sysPrompt = systemPrompts[screen] || systemPrompts.chat;
+    let finalText = userText;
+    if (screen === 'files' && fileContent) {
+      finalText = `Файл:\n\n${fileContent}\n\nВопрос пользователя: ${userText}`;
+    }
+
+    try {
+      const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + API_KEY,
+          'HTTP-Referer': location.href,
+          'X-Title': 'Jarvis AI'
+        },
+        body: JSON.stringify({
+          model: MODEL,
+          messages: [
+            { role: 'system', content: sysPrompt },
+            { role: 'user', content: finalText }
+          ],
+          stream: true
+        })
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.error?.message || 'Ошибка API: ' + res.status);
+      }
+
+      typing.remove();
+      const bubble = appendMsg(screen, 'ai', '');
+      let full = '';
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n');
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          const data = line.slice(6).trim();
+          if (data === '[DONE]') break;
+          try {
+            const j = JSON.parse(data);
+            const delta = j.choices?.[0]?.delta?.content || '';
+            full += delta;
+            bubble.innerHTML = formatText(full);
+            scrollBottom(container);
+          } catch {}
         }
-        if (audioCtx.state === 'suspended') audioCtx.resume();
+      }
+
+      // Save to history
+      const entry = { id: Date.now(), screen, preview: userText.slice(0, 80), date: new Date().toLocaleString('ru'), response: full.slice(0, 200) };
+      history.unshift(entry);
+      if (history.length > 50) history.pop();
+      localStorage.setItem('jarvis_history', JSON.stringify(history));
+
+    } catch (e) {
+      typing.remove();
+      appendMsg(screen, 'ai', '❌ Ошибка: ' + e.message);
+    } finally {
+      isLoading = false;
     }
+  }
 
-    function playSound(type) {
-        if (!soundEnabled || !audioCtx) return;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        const now = audioCtx.currentTime;
-        switch (type) {
-            case 'pickup':
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(500, now);
-                osc.frequency.exponentialRampToValueAtTime(700, now + 0.08);
-                gain.gain.setValueAtTime(0.15, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-                osc.start(now); osc.stop(now + 0.1);
-                break;
-            case 'place':
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(600, now);
-                osc.frequency.exponentialRampToValueAtTime(450, now + 0.12);
-                gain.gain.setValueAtTime(0.2, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-                osc.start(now); osc.stop(now + 0.15);
-                break;
-            case 'clear':
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(400, now);
-                osc.frequency.setValueAtTime(600, now + 0.1);
-                osc.frequency.setValueAtTime(800, now + 0.2);
-                gain.gain.setValueAtTime(0.25, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-                osc.start(now); osc.stop(now + 0.3);
-                break;
-            case 'combo':
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(300, now);
-                osc.frequency.setValueAtTime(500, now + 0.08);
-                osc.frequency.setValueAtTime(700, now + 0.16);
-                gain.gain.setValueAtTime(0.15, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
-                osc.start(now); osc.stop(now + 0.35);
-                break;
-            case 'gameover':
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(350, now);
-                osc.frequency.exponentialRampToValueAtTime(80, now + 0.6);
-                gain.gain.setValueAtTime(0.15, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.7);
-                osc.start(now); osc.stop(now + 0.7);
-                break;
-            case 'error':
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(200, now);
-                osc.frequency.exponentialRampToValueAtTime(100, now + 0.15);
-                gain.gain.setValueAtTime(0.1, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-                osc.start(now); osc.stop(now + 0.15);
-                break;
-        }
-    }
+  // ── Clear chat ──
+  function clearChat() {
+    const s = currentScreen;
+    const c = document.getElementById(s + 'Messages');
+    if (c) { c.innerHTML = ''; }
+    if (s === 'files') fileContent = '';
+    showToast('Чат очищен');
+  }
 
-    function vibrate(pattern) {
-        if (vibroEnabled && navigator.vibrate) navigator.vibrate(pattern);
-    }
-
-    // ==================== КОНСТАНТЫ ====================
-    const BOARD_SIZE = 8;
-    const PIECES_COUNT = 3;
-
-    const PIECE_DEFINITIONS = [
-        { shape: [[1]], color: 0 },
-        { shape: [[1,1]], color: 1 },
-        { shape: [[1],[1]], color: 2 },
-        { shape: [[1,1,1]], color: 3 },
-        { shape: [[1],[1],[1]], color: 4 },
-        { shape: [[1,0],[1,1]], color: 5 },
-        { shape: [[0,1],[1,1]], color: 6 },
-        { shape: [[1,1],[1,0]], color: 7 },
-        { shape: [[1,1],[0,1]], color: 0 },
-        { shape: [[1,1,1,1]], color: 1 },
-        { shape: [[1],[1],[1],[1]], color: 2 },
-        { shape: [[1,1],[1,1]], color: 3 },
-        { shape: [[1,1,1],[0,1,0]], color: 4 },
-        { shape: [[0,1,0],[1,1,1]], color: 5 },
-        { shape: [[1,0,0],[1,1,1]], color: 6 },
-        { shape: [[0,0,1],[1,1,1]], color: 7 },
-        { shape: [[1,1,1],[1,0,0]], color: 0 },
-        { shape: [[1,1,1],[0,0,1]], color: 1 },
-        { shape: [[0,1,1],[1,1,0]], color: 2 },
-        { shape: [[1,1,0],[0,1,1]], color: 3 },
-        { shape: [[1,1,1,1,1]], color: 4 },
-        { shape: [[1],[1],[1],[1],[1]], color: 5 },
-        { shape: [[0,1,0],[1,1,1],[0,1,0]], color: 6 },
-        { shape: [[1,1,1],[1,1,1]], color: 7 },
-        { shape: [[1,1],[1,1],[1,1]], color: 0 },
-        { shape: [[1,0,0],[1,0,0],[1,1,1]], color: 1 },
-        { shape: [[0,0,1],[0,0,1],[1,1,1]], color: 2 },
-        { shape: [[1,1,1],[1,0,0],[1,0,0]], color: 3 },
-        { shape: [[1,1,1],[0,0,1],[0,0,1]], color: 4 },
-    ];
-
-    // ==================== СОСТОЯНИЕ ====================
-    let board = [];
-    let score = 0;
-    let highScore = 0;
-    let pieces = [];
-    let isGameOver = false;
-
-    // Состояние перетаскивания
-    let drag = {
-        active: false,
-        pieceIndex: -1,
-        el: null,
-        piece: null,
-        // Смещение от центра фигуры до указателя (в пикселях)
-        offX: 0,
-        offY: 0,
-        // Размер одной ячейки в перетаскиваемой фигуре
-        cellPx: 0,
-        cellGap: 0
+  // ── File handling ──
+  function handleFile(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      fileContent = ev.target.result;
+      const msg = `📄 Файл загружен: **${file.name}** (${(file.size/1024).toFixed(1)} КБ)\n\nМогу ответить на вопросы о содержимом.`;
+      appendMsg('files', 'ai', msg);
+      showToast('Файл загружен: ' + file.name);
     };
+    reader.readAsText(file, 'UTF-8');
+  }
+  function dragOver(e) { e.preventDefault(); document.getElementById('dropZone').classList.add('drag-over'); }
+  function dragLeave() { document.getElementById('dropZone').classList.remove('drag-over'); }
+  function dropFile(e) {
+    e.preventDefault();
+    dragLeave();
+    const file = e.dataTransfer.files[0];
+    if (!file) return;
+    const fakeEv = { target: { files: [file] } };
+    handleFile(fakeEv);
+  }
 
-    // ==================== РАЗМЕРЫ (вычисляем один раз при старте) ====================
-    // Размер ячейки доски (в пикселях, с учётом реальных размеров)
-    function getBoardCellSize() {
-        const boardEl = document.getElementById('board');
-        const rect = boardEl.getBoundingClientRect();
-        // gap: 2px между 8 ячейками = 7*2 = 14px gap, доска = 8 ячеек + зазоры
-        return (rect.width - 7 * 2) / 8;
+  // ── History ──
+  function renderHistory() {
+    const el = document.getElementById('historyList');
+    if (!history.length) {
+      el.innerHTML = '<p class="history-empty">История пуста</p>'; return;
     }
-
-    // Размер ячейки в превью-фигуре
-    function getPieceCellSize() {
-        const w = window.innerWidth;
-        if (w < 360) return 16;
-        if (w < 420) return 18;
-        return 20;
-    }
-
-    function getPieceCellGap() {
-        return 2;
-    }
-
-    // ==================== ЭКРАНЫ ====================
-    function showScreen(screen) {
-        document.getElementById('menuScreen').classList.toggle('hidden', screen !== 'menu');
-        document.getElementById('gameScreen').classList.toggle('active', screen === 'game');
-        document.getElementById('settingsScreen').classList.remove('show');
-        if (screen === 'menu') {
-            document.getElementById('menuHighScore').textContent = highScore;
-        }
-    }
-
-    // ==================== ИНИЦИАЛИЗАЦИЯ ====================
-    function init() {
-        loadHighScore();
-        setupEventListeners();
-        showScreen('menu');
-    }
-
-    function loadHighScore() {
-        const saved = localStorage.getItem('blockblast_highscore_v3');
-        if (saved) highScore = parseInt(saved);
-        document.getElementById('menuHighScore').textContent = highScore;
-        document.getElementById('highScoreValue').textContent = highScore;
-    }
-
-    function saveHighScore() {
-        if (score > highScore) {
-            highScore = score;
-            localStorage.setItem('blockblast_highscore_v3', highScore);
-            document.getElementById('menuHighScore').textContent = highScore;
-            document.getElementById('highScoreValue').textContent = highScore;
-        }
-    }
-
-    function createBoard() {
-        board = Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null));
-        const boardEl = document.getElementById('board');
-        boardEl.innerHTML = '';
-
-        // Вычисляем размер доски: занимаем доступное пространство
-        const availW = Math.min(window.innerWidth - 32, 420);
-        boardEl.style.width = availW + 'px';
-        boardEl.style.height = availW + 'px';
-
-        for (let r = 0; r < BOARD_SIZE; r++) {
-            for (let c = 0; c < BOARD_SIZE; c++) {
-                const cell = document.createElement('div');
-                cell.className = 'cell';
-                cell.dataset.row = r;
-                cell.dataset.col = c;
-                boardEl.appendChild(cell);
-            }
-        }
-    }
-
-    function startGame() {
-        initAudio();
-        score = 0;
-        isGameOver = false;
-        createBoard();
-        renderBoard();
-        generatePieces();
-        updateScoreDisplay(false);
-        showScreen('game');
-        document.getElementById('gameOverScreen').classList.remove('show');
-    }
-
-    // ==================== ФИГУРЫ ====================
-    function generatePieces() {
-        pieces = [];
-        const usedShapes = new Set();
-        for (let i = 0; i < PIECES_COUNT; i++) {
-            let def, attempts = 0;
-            do {
-                def = PIECE_DEFINITIONS[Math.floor(Math.random() * PIECE_DEFINITIONS.length)];
-                attempts++;
-            } while (usedShapes.has(JSON.stringify(def.shape)) && attempts < 60);
-            usedShapes.add(JSON.stringify(def.shape));
-            pieces.push({ shape: def.shape.map(row => [...row]), color: def.color, used: false });
-        }
-        renderPieces();
-    }
-
-    function renderPieces() {
-        for (let i = 0; i < PIECES_COUNT; i++) {
-            const slot = document.getElementById('slot' + i);
-            slot.innerHTML = '';
-            if (!pieces[i] || pieces[i].used) {
-                slot.classList.remove('active');
-                slot.classList.add('empty');
-                continue;
-            }
-            slot.classList.add('active');
-            slot.classList.remove('empty');
-            slot.appendChild(createPieceElement(pieces[i], i, getPieceCellSize(), getPieceCellGap()));
-        }
-    }
-
-    function createPieceElement(piece, index, cellPx, gap) {
-        const rows = piece.shape.length;
-        const cols = piece.shape[0].length;
-        const el = document.createElement('div');
-        el.className = 'piece';
-        el.dataset.pieceIndex = index;
-        el.style.gridTemplateColumns = `repeat(${cols}, ${cellPx}px)`;
-        el.style.gridTemplateRows = `repeat(${rows}, ${cellPx}px)`;
-        el.style.gap = gap + 'px';
-        for (let r = 0; r < rows; r++) {
-            for (let c = 0; c < cols; c++) {
-                const cell = document.createElement('div');
-                cell.className = 'piece-cell';
-                cell.style.width = cellPx + 'px';
-                cell.style.height = cellPx + 'px';
-                if (piece.shape[r][c]) {
-                    cell.classList.add('color-' + piece.color);
-                } else {
-                    cell.style.visibility = 'hidden';
-                }
-                el.appendChild(cell);
-            }
-        }
-        return el;
-    }
-
-    // ==================== ДОСКА ====================
-    function renderBoard() {
-        const cells = document.querySelectorAll('.cell');
-        cells.forEach(cell => {
-            const r = parseInt(cell.dataset.row);
-            const c = parseInt(cell.dataset.col);
-            // Сбрасываем все классы кроме 'cell'
-            cell.className = 'cell';
-            if (board[r][c] !== null) {
-                cell.classList.add('filled', 'color-' + board[r][c]);
-            }
-        });
-    }
-
-    // ==================== ПРЕВЬЮ ====================
-    function showPreview(piece, startRow, startCol) {
-        clearPreview();
-        if (!piece) return false;
-        const isValid = canPlacePiece(piece, startRow, startCol);
-        const cls = isValid ? 'preview-valid' : 'preview-invalid';
-        for (let r = 0; r < piece.shape.length; r++) {
-            for (let c = 0; c < piece.shape[r].length; c++) {
-                if (!piece.shape[r][c]) continue;
-                const br = startRow + r;
-                const bc = startCol + c;
-                if (br < 0 || br >= BOARD_SIZE || bc < 0 || bc >= BOARD_SIZE) continue;
-                const cell = document.querySelector(`.cell[data-row="${br}"][data-col="${bc}"]`);
-                if (!cell) continue;
-                if (board[br][bc] === null) {
-                    cell.classList.add(cls, 'color-' + piece.color);
-                }
-            }
-        }
-        return isValid;
-    }
-
-    function clearPreview() {
-        document.querySelectorAll('.cell').forEach(cell => {
-            if (!cell.classList.contains('filled')) {
-                cell.className = 'cell';
-            }
-        });
-    }
-
-    // ==================== ЛОГИКА ====================
-    function canPlacePiece(piece, startRow, startCol) {
-        if (startRow === undefined || startCol === undefined) return false;
-        for (let r = 0; r < piece.shape.length; r++) {
-            for (let c = 0; c < piece.shape[r].length; c++) {
-                if (!piece.shape[r][c]) continue;
-                const br = startRow + r;
-                const bc = startCol + c;
-                if (br < 0 || br >= BOARD_SIZE || bc < 0 || bc >= BOARD_SIZE) return false;
-                if (board[br][bc] !== null) return false;
-            }
-        }
-        return true;
-    }
-
-    function placePiece(piece, startRow, startCol) {
-        for (let r = 0; r < piece.shape.length; r++) {
-            for (let c = 0; c < piece.shape[r].length; c++) {
-                if (piece.shape[r][c]) {
-                    board[startRow + r][startCol + c] = piece.color;
-                }
-            }
-        }
-    }
-
-    function checkLines() {
-        const lines = [];
-        for (let r = 0; r < BOARD_SIZE; r++) {
-            if (board[r].every(cell => cell !== null)) lines.push({ type: 'row', index: r });
-        }
-        for (let c = 0; c < BOARD_SIZE; c++) {
-            if (board.every(row => row[c] !== null)) lines.push({ type: 'col', index: c });
-        }
-        return lines;
-    }
-
-    function clearLines(lines) {
-        const cleared = new Set();
-        lines.forEach(line => {
-            if (line.type === 'row') {
-                for (let c = 0; c < BOARD_SIZE; c++) cleared.add(line.index + ',' + c);
-            } else {
-                for (let r = 0; r < BOARD_SIZE; r++) cleared.add(r + ',' + line.index);
-            }
-        });
-        cleared.forEach(key => {
-            const [r, c] = key.split(',').map(Number);
-            const cell = document.querySelector(`.cell[data-row="${r}"][data-col="${c}"]`);
-            if (cell) {
-                cell.classList.add('clearing');
-                createParticles(cell);
-            }
-        });
-        setTimeout(() => {
-            lines.forEach(line => {
-                if (line.type === 'row') {
-                    for (let c = 0; c < BOARD_SIZE; c++) board[line.index][c] = null;
-                } else {
-                    for (let r = 0; r < BOARD_SIZE; r++) board[r][line.index] = null;
-                }
-            });
-            renderBoard();
-        }, 450);
-        return cleared.size;
-    }
-
-    function calculateScore(linesCount, cellsCleared) {
-        let mult = 1;
-        if (linesCount === 2) mult = 1.5;
-        else if (linesCount === 3) mult = 2.5;
-        else if (linesCount >= 4) mult = 4;
-        return Math.floor(cellsCleared * 10 * mult);
-    }
-
-    function updateScoreDisplay(animate) {
-        const el = document.getElementById('scoreValue');
-        el.textContent = score;
-        if (animate) {
-            el.classList.remove('pop');
-            void el.offsetWidth;
-            el.classList.add('pop');
-        }
-    }
-
-    function checkGameOver() {
-        // Есть ли хоть одна незаиспользованная фигура, которую можно поставить
-        for (let i = 0; i < PIECES_COUNT; i++) {
-            if (pieces[i] && !pieces[i].used) {
-                for (let r = 0; r < BOARD_SIZE; r++) {
-                    for (let c = 0; c < BOARD_SIZE; c++) {
-                        if (canPlacePiece(pieces[i], r, c)) return false;
-                    }
-                }
-            }
-        }
-        return true;
-    }
-
-    function triggerGameOver() {
-        if (isGameOver) return;
-        isGameOver = true;
-        saveHighScore();
-        playSound('gameover');
-        vibrate([100, 50, 100, 50, 200]);
-        setTimeout(() => {
-            document.getElementById('finalScore').textContent = score;
-            document.getElementById('finalBest').textContent = 'Лучший: ' + highScore;
-            document.getElementById('gameOverScreen').classList.add('show');
-        }, 800);
-    }
-
-    // ==================== ЭФФЕКТЫ ====================
-    function createParticles(cell) {
-        const rect = cell.getBoundingClientRect();
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
-        const colors = ['#e94560','#f9a826','#16c79a','#118ab2','#9b5de5','#ef476f','#00bbf9','#ff6b35'];
-        const container = document.createElement('div');
-        container.className = 'particles-container';
-        container.style.left = cx + 'px';
-        container.style.top = cy + 'px';
-        document.body.appendChild(container);
-        for (let i = 0; i < 8; i++) {
-            const p = document.createElement('div');
-            p.className = 'particle';
-            const size = 5 + Math.random() * 5;
-            p.style.width = size + 'px';
-            p.style.height = size + 'px';
-            p.style.background = colors[Math.floor(Math.random() * colors.length)];
-            const angle = (Math.PI * 2 * i) / 8 + (Math.random() - 0.5) * 0.4;
-            const dist = 20 + Math.random() * 35;
-            p.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
-            p.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
-            container.appendChild(p);
-        }
-        setTimeout(() => container.remove(), 800);
-    }
-
-    function showFloatingText(text, x, y, className) {
-        const el = document.createElement('div');
-        el.className = className;
-        el.textContent = text;
-        el.style.left = x + 'px';
-        el.style.top = y + 'px';
-        document.body.appendChild(el);
-        setTimeout(() => el.remove(), 1000);
-    }
-
-    // ==================== DRAG & DROP ====================
-
-    // Получаем координаты указателя (мышь или тач)
-    function getPos(e) {
-        if (e.changedTouches && e.changedTouches.length > 0) {
-            return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
-        }
-        if (e.touches && e.touches.length > 0) {
-            return { x: e.touches[0].clientX, y: e.touches[0].clientY };
-        }
-        return { x: e.clientX, y: e.clientY };
-    }
-
-    // Вычисляем позицию на доске из координат указателя
-    // Возвращает верхний-левый угол для размещения фигуры (центрированной под пальцем)
-    function getBoardPos(clientX, clientY, piece) {
-        const boardEl = document.getElementById('board');
-        const rect = boardEl.getBoundingClientRect();
-        const cellSize = getBoardCellSize();
-        const GAP = 2;
-
-        // Ячейка под указателем
-        const relX = clientX - rect.left;
-        const relY = clientY - rect.top;
-
-        // Индекс ячейки с учётом gap
-        const col = Math.floor(relX / (cellSize + GAP));
-        const row = Math.floor(relY / (cellSize + GAP));
-
-        if (col < 0 || col >= BOARD_SIZE || row < 0 || row >= BOARD_SIZE) return null;
-
-        // Центрируем фигуру под указателем
-        const startRow = row - Math.floor(piece.shape.length / 2);
-        const startCol = col - Math.floor(piece.shape[0].length / 2);
-
-        return { row: startRow, col: startCol, centerRow: row, centerCol: col };
-    }
-
-    function onPointerDown(e) {
-        if (isGameOver || drag.active) return;
-        const pieceEl = e.target.closest('.piece');
-        if (!pieceEl) return;
-
-        const index = parseInt(pieceEl.dataset.pieceIndex);
-        if (!pieces[index] || pieces[index].used) return;
-
-        e.preventDefault();
-        initAudio();
-
-        const pos = getPos(e);
-        const piece = pieces[index];
-        const cellPx = getPieceCellSize();
-        const gap = getPieceCellGap();
-
-        // Создаём перетаскиваемый клон
-        const dragEl = createPieceElement(piece, index, cellPx, gap);
-        dragEl.classList.add('dragging');
-        document.body.appendChild(dragEl);
-
-        // Размер фигуры
-        const rows = piece.shape.length;
-        const cols = piece.shape[0].length;
-        const totalW = cols * cellPx + (cols - 1) * gap;
-        const totalH = rows * cellPx + (rows - 1) * gap;
-
-        // Центрируем клон под пальцем
-        const left = pos.x - totalW / 2;
-        // Поднимаем немного выше пальца чтобы фигура была видна
-        const top = pos.y - totalH - 20;
-
-        dragEl.style.left = left + 'px';
-        dragEl.style.top = top + 'px';
-
-        drag = {
-            active: true,
-            pieceIndex: index,
-            el: dragEl,
-            piece: piece,
-            offX: totalW / 2,
-            offY: totalH + 20,
-            cellPx: cellPx,
-            cellGap: gap
-        };
-
-        // Скрываем оригинал в слоте
-        const slot = document.getElementById('slot' + index);
-        slot.innerHTML = '';
-        slot.classList.remove('active');
-        slot.classList.add('empty');
-
-        playSound('pickup');
-        vibrate(10);
-    }
-
-    function onPointerMove(e) {
-        if (!drag.active || !drag.el) return;
-        e.preventDefault();
-        const pos = getPos(e);
-
-        drag.el.style.left = (pos.x - drag.offX) + 'px';
-        drag.el.style.top = (pos.y - drag.offY) + 'px';
-
-        const boardEl = document.getElementById('board');
-        const rect = boardEl.getBoundingClientRect();
-        const inBoard = pos.x >= rect.left && pos.x <= rect.right &&
-                        pos.y >= rect.top && pos.y <= rect.bottom;
-
-        if (inBoard) {
-            const bp = getBoardPos(pos.x, pos.y, drag.piece);
-            if (bp) showPreview(drag.piece, bp.row, bp.col);
-            else clearPreview();
-        } else {
-            clearPreview();
-        }
-    }
-
-    function onPointerUp(e) {
-        if (!drag.active || !drag.el) return;
-        e.preventDefault();
-
-        const pos = getPos(e);
-        let placed = false;
-
-        const boardEl = document.getElementById('board');
-        const rect = boardEl.getBoundingClientRect();
-        const inBoard = pos.x >= rect.left && pos.x <= rect.right &&
-                        pos.y >= rect.top && pos.y <= rect.bottom;
-
-        if (inBoard) {
-            const bp = getBoardPos(pos.x, pos.y, drag.piece);
-            if (bp && canPlacePiece(drag.piece, bp.row, bp.col)) {
-                const pieceIndex = drag.pieceIndex;
-                const piece = drag.piece;
-                const sr = bp.row;
-                const sc = bp.col;
-
-                placePiece(piece, sr, sc);
-                pieces[pieceIndex].used = true;
-                placed = true;
-
-                playSound('place');
-                vibrate(20);
-                renderBoard();
-
-                setTimeout(() => {
-                    const lines = checkLines();
-                    const delay = lines.length > 0 ? 550 : 0;
-
-                    if (lines.length > 0) {
-                        const cellsCleared = clearLines(lines);
-                        const pts = calculateScore(lines.length, cellsCleared);
-                        score += pts;
-                        updateScoreDisplay(true);
-                        saveHighScore();
-
-                        const br = boardEl.getBoundingClientRect();
-                        const mx = br.left + br.width / 2;
-                        const my = br.top + br.height / 2;
-                        showFloatingText('+' + pts, mx, my, 'points-text');
-
-                        if (lines.length >= 2) {
-                            playSound('combo');
-                            vibrate([30, 30, 30]);
-                            setTimeout(() => showFloatingText('COMBO x' + lines.length + '!', mx, my - 50, 'combo-text'), 200);
-                        } else {
-                            playSound('clear');
-                            vibrate(30);
-                        }
-                    }
-
-                    // После анимации — проверяем следующий шаг
-                    setTimeout(() => {
-                        const allUsed = pieces.every(p => p.used);
-                        if (allUsed) {
-                            generatePieces();
-                            // checkGameOver вызываем ПОСЛЕ renderPieces (внутри generatePieces)
-                            requestAnimationFrame(() => {
-                                if (checkGameOver()) triggerGameOver();
-                            });
-                        } else {
-                            if (checkGameOver()) triggerGameOver();
-                        }
-                    }, delay);
-                }, 30);
-            }
-        }
-
-        // Удаляем drag-элемент
-        if (drag.el) drag.el.remove();
-        drag = { active: false, pieceIndex: -1, el: null, piece: null, offX: 0, offY: 0, cellPx: 0, cellGap: 0 };
-        clearPreview();
-
-        if (!placed) {
-            playSound('error');
-            vibrate([50, 30]);
-            renderPieces(); // Восстанавливаем фигуру в слоте
-        }
-    }
-
-    // ==================== ОБРАБОТЧИКИ СОБЫТИЙ ====================
-    function setupEventListeners() {
-        document.getElementById('btnPlay').addEventListener('click', () => { initAudio(); startGame(); });
-        document.getElementById('btnSettings').addEventListener('click', () => { document.getElementById('settingsScreen').classList.add('show'); });
-        document.getElementById('btnBackSettings').addEventListener('click', () => { document.getElementById('settingsScreen').classList.remove('show'); });
-        document.getElementById('btnBack').addEventListener('click', () => { showScreen('menu'); });
-
-        document.getElementById('toggleSound').addEventListener('click', function () {
-            soundEnabled = !soundEnabled;
-            this.classList.toggle('active', soundEnabled);
-        });
-        document.getElementById('toggleVibro').addEventListener('click', function () {
-            vibroEnabled = !vibroEnabled;
-            this.classList.toggle('active', vibroEnabled);
-        });
-
-        document.getElementById('btnRestart').addEventListener('click', () => { initAudio(); startGame(); });
-        document.getElementById('btnMenu').addEventListener('click', () => {
-            document.getElementById('gameOverScreen').classList.remove('show');
-            showScreen('menu');
-        });
-
-        const container = document.getElementById('piecesContainer');
-
-        // Мышь
-        container.addEventListener('mousedown', onPointerDown);
-        window.addEventListener('mousemove', onPointerMove);
-        window.addEventListener('mouseup', onPointerUp);
-
-        // Тач — passive:false чтобы preventDefault работал
-        container.addEventListener('touchstart', onPointerDown, { passive: false });
-        window.addEventListener('touchmove', onPointerMove, { passive: false });
-        window.addEventListener('touchend', onPointerUp, { passive: false });
-        window.addEventListener('touchcancel', onPointerUp, { passive: false });
-
-        document.addEventListener('contextmenu', e => e.preventDefault());
-        document.addEventListener('dragstart', e => e.preventDefault());
-    }
-
-    // ==================== СТАРТ ====================
-    init();
-    </script>
+    el.innerHTML = history.map(h => `
+      <div class="history-item">
+        <div class="hi-date">${h.date}</div>
+        <div class="hi-preview">${escapeHtml(h.preview)}</div>
+        <div class="hi-feature">${screenTitles[h.screen] || h.screen}</div>
+      </div>
+    `).join('');
+  }
+
+  // ── Toast ──
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  // ── Sidebar toggle ──
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+  }
+
+  // ── Init ──
+  showScreen('home');
+</script>
 </body>
 </html>
