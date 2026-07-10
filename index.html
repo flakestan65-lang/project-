@@ -668,8 +668,8 @@
 
 <script>
   // ── Конфигурация — вставьте сюда ваши данные ──
-  const API_KEY = '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';   // ← вставьте ключ сюда
-  const MODEL   = 'meta-llama/llama-3.3-70b-instruct:free';      // ← вставьте модель сюда
+  const API_KEY = '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';   // ← вставьте ключ сюда
+  const MODEL   = 'google/gemma-3-27b-it:free';      // ← вставьте модель сюда
 
   // ── State ──
   let currentScreen = 'home';
@@ -835,49 +835,35 @@
             { role: 'system', content: sysPrompt },
             { role: 'user', content: finalText }
           ],
-          stream: true
+          stream: false
         })
       });
 
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err?.error?.message || 'Ошибка API: ' + res.status);
-      }
+      const data = await res.json();
 
       typing.remove();
-      const bubble = appendMsg(screen, 'ai', '');
-      let full = '';
 
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const chunk = decoder.decode(value);
-        const lines = chunk.split('\n');
-        for (const line of lines) {
-          if (!line.startsWith('data: ')) continue;
-          const data = line.slice(6).trim();
-          if (data === '[DONE]') break;
-          try {
-            const j = JSON.parse(data);
-            const delta = j.choices?.[0]?.delta?.content || '';
-            full += delta;
-            bubble.innerHTML = formatText(full);
-            scrollBottom(container);
-          } catch {}
-        }
+      if (!res.ok) {
+        const code = data?.error?.code || res.status;
+        const msg  = data?.error?.message || 'Неизвестная ошибка';
+        const meta = data?.error?.metadata?.raw ? '\n\n' + data.error.metadata.raw : '';
+        throw new Error(`[${code}] ${msg}${meta}`);
       }
 
+      const answer = data?.choices?.[0]?.message?.content;
+      if (!answer) throw new Error('Модель вернула пустой ответ. Проверьте название модели.');
+
+      appendMsg(screen, 'ai', answer);
+
       // Save to history
-      const entry = { id: Date.now(), screen, preview: userText.slice(0, 80), date: new Date().toLocaleString('ru'), response: full.slice(0, 200) };
+      const entry = { id: Date.now(), screen, preview: userText.slice(0, 80), date: new Date().toLocaleString('ru') };
       history.unshift(entry);
       if (history.length > 50) history.pop();
       localStorage.setItem('jarvis_history', JSON.stringify(history));
 
     } catch (e) {
       typing.remove();
-      appendMsg(screen, 'ai', '❌ Ошибка: ' + e.message);
+      appendMsg(screen, 'ai', '❌ ' + e.message);
     } finally {
       isLoading = false;
     }
