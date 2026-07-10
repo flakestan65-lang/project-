@@ -114,8 +114,8 @@
     // ═══════════════════════════════════════════════════════════
     // КОНФИГУРАЦИЯ OPENROUTER
     // ═══════════════════════════════════════════════════════════
-    const OPENROUTER_API_KEY = "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"; // ← ВСТАВЬТЕ СЮДА КЛЮЧ
-    const OPENROUTER_MODEL = "openrouter/free"; // ← МОДЕЛЬ
+    const OPENROUTER_API_KEY = "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";
+    const OPENROUTER_MODEL = "openrouter/free";
     const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
     const isApiConfigured = () => OPENROUTER_API_KEY.trim().length > 0;
 
@@ -415,6 +415,24 @@
       if (chat) chat.scrollTop = chat.scrollHeight;
     }
 
+    function updateSendButton() {
+      const sendBtn = document.getElementById('btn-send');
+      if (!sendBtn) return;
+      if (state.inputValue.trim()) {
+        sendBtn.classList.remove('opacity-30');
+      } else {
+        sendBtn.classList.add('opacity-30');
+      }
+    }
+
+    function focusInput() {
+      const input = document.getElementById('chat-input');
+      if (input) {
+        input.focus();
+        input.setSelectionRange(input.value.length, input.value.length);
+      }
+    }
+
     // ───────────────────────────────────────────────────────────
     // ОБРАБОТКА СОБЫТИЙ
     // ───────────────────────────────────────────────────────────
@@ -428,7 +446,7 @@
       if (input) {
         input.addEventListener('input', (e) => {
           state.inputValue = e.target.value;
-          render();
+          updateSendButton();
         });
         input.addEventListener('keydown', (e) => {
           if (e.key === 'Enter') handleSend();
@@ -482,6 +500,7 @@
       });
       state.isTyping = true;
       render();
+      focusInput();
 
       if (!isApiConfigured()) {
         setTimeout(() => {
@@ -493,6 +512,7 @@
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
           });
           render();
+          focusInput();
         }, 1000);
         return;
       }
@@ -516,6 +536,7 @@
         });
       }
       render();
+      focusInput();
     }
 
     // ───────────────────────────────────────────────────────────
